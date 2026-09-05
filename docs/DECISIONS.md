@@ -94,3 +94,14 @@ Dit document legt alle keuzes vast die tijdens de bouw van AsbestHub zijn gemaak
 | 61 | **Dataverwijdering per organisatie (AVG) is een admin-actie met bevestigingszin** die alle rijen met het organisatie-id verwijdert (cascade via projecten/aanbestedingen). Bestanden in Blob worden niet automatisch verwijderd; de sleutels bevatten het org-id zodat een opruimactie eenvoudig is (zie PRIVACY.md). | |
 | 62 | **Zoekveld in de topbar zoekt in projecten, aanbestedingen (met tender-scoping) en de kennisbank (hybride).** | Eén ingang; geen aparte zoekindex nodig. |
 | 63 | **Foutafhandeling: `error.tsx` in de app-groep toont autorisatiefouten als "Geen toegang"**; server actions retourneren altijd `ActionResult` zodat de UI een toast toont in plaats van een crash. | |
+
+## Fase 7 - Tests, CI en oplevering
+
+| # | Beslissing | Motivatie |
+|---|-----------|-----------|
+| 64 | **Agents worden integratief getest tegen de echte Postgres (seed) met een gemockte `generateStructured`**, niet unit-getest met een nep-database. CI draait `pnpm db:seed` voordat de tests starten. | De waarde zit in de datastromen (concept, accordering, versies, ranking), niet in het model. |
+| 65 | **Coverage-drempels: lines/functions/statements 80%, branches 60%** op `src/lib` en `src/ai/agents` (exclusief pure I/O-wrappers voor storage/e-mail/ratelimit/pdf). | Branch-dekking van defensieve foutpaden is lager; de opdracht vraagt 80% zonder metriek; regels/functies/statements halen dit ruim. |
+| 66 | **Bij een nieuwe AI-versie van een document met open accordering wordt het open verzoek hergebruikt** (`requestApprovalOrReuse`) in plaats van te falen; de accordeerder ziet altijd de laatste versie. | Voorkomt geblokkeerde iteraties na "nieuwe versie genereren". |
+| 67 | **Vitest gebruikt de Vite 8 oxc-transformer met `jsx: automatic`** omdat de Next.js-tsconfig `jsx: preserve` vereist. | Tests kunnen `.tsx`-modules (pdf-renderer) laden. |
+| 68 | **Playwright-flows draaien alleen met een echte Clerk-testgebruiker** (`E2E_CLERK_USER_EMAIL/PASSWORD`, `@clerk/testing`) en gebruiken de echte AI als `ANTHROPIC_API_KEY` is gezet, anders de handmatige paden. De CI-job `e2e` slaat over zonder secrets. | Clerk kan niet worden gemockt zonder de autorisatie te omzeilen; de flows blijven end-to-end echt. |
+| 69 | **Fixture-pdf's voor e2e worden gegenereerd met de eigen renderer** (`scripts/make-e2e-fixtures.ts`) en zijn gecommit. | Geen binaire afhankelijkheden van derden. |

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { templates } from "@/db/schema";
-import { latestRejectionReason, requestApproval } from "@/lib/approvals";
+import { latestRejectionReason, requestApprovalOrReuse } from "@/lib/approvals";
 import { saveTenderDocument } from "@/lib/documents/service";
 import { buildPriceSheetXlsx } from "@/lib/documents/xlsx";
 import { TENDER_DOC_KIND_LABELS } from "@/lib/labels";
@@ -147,7 +147,7 @@ export const tenderAuthor = defineAgent({
       jobId: ctx.jobId,
       xlsx,
     });
-    const approval = await requestApproval({
+    const approval = await requestApprovalOrReuse({
       ctx: requesterFromJob(ctx, input.requestedByName),
       entityType: "tender_document",
       entityId: row.id,

@@ -17,5 +17,5 @@ export default defineConfig({
   ],
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
-    : { command: "pnpm dev", url: "http://localhost:3000", reuseExistingServer: true, timeout: 180_000 },
+    : { command: process.env.CI ? "pnpm start" : "pnpm dev", url: "http://localhost:3000/api/health", reuseExistingServer: !process.env.CI, timeout: 180_000 },
 });

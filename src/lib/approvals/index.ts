@@ -106,6 +106,30 @@ export async function requestApproval(input: RequestApprovalInput) {
   return row;
 }
 
+/**
+ * Like requestApproval, but when an open request already exists for the entity
+ * (e.g. a new AI version of a document under review) the open request is kept
+ * and its label/snapshot refreshed instead of failing.
+ */
+export async function requestApprovalOrReuse(input: RequestApprovalInput) {
+  const existing = await db.query.approvals.findFirst({
+    where: and(
+      eq(approvals.organizationId, input.ctx.orgId),
+      eq(approvals.entityType, input.entityType),
+      eq(approvals.entityId, input.entityId),
+      eq(approvals.status, "open"),
+    ),
+  });
+  if (!existing) return requestApproval(input);
+  const [updated] = await db
+    .update(approvals)
+    .set({ entityLabel: input.label, snapshot: { ...existing.snapshot, ...(input.snapshot ?? {}), vervangen: true } })
+    .where(eq(approvals.id, existing.id))
+    .returning();
+  await ENTITY_HANDLERS[input.entityType].onRequest({ orgId: input.ctx.orgId, entityId: input.entityId, userId: input.ctx.userId, userName: input.ctx.name, now: new Date(), comment: null });
+  return updated ?? existing;
+}
+
 export interface DecideApprovalInput {
   ctx: AppContext;
   approvalId: string;

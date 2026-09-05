@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { documents, templates } from "@/db/schema";
-import { latestRejectionReason, requestApproval } from "@/lib/approvals";
+import { latestRejectionReason, requestApprovalOrReuse } from "@/lib/approvals";
 import { saveProjectDocument } from "@/lib/documents/service";
 import { DOCUMENT_TYPE_LABELS } from "@/lib/labels";
 import { describeProject, loadProjectBundle } from "@/lib/project-data";
@@ -152,7 +152,7 @@ export const documentAuthor = defineAgent({
       changeNote: rejection ? `Nieuwe versie na afwijzing: ${rejection}` : input.instructions,
       jobId: ctx.jobId,
     });
-    const approval = await requestApproval({
+    const approval = await requestApprovalOrReuse({
       ctx: requesterFromJob(ctx, input.requestedByName),
       entityType: "document",
       entityId: row.id,
