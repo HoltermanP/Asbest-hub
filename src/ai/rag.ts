@@ -44,17 +44,53 @@ export async function searchKnowledge(
   const lists: RankedRow[][] = [];
   const rowsById = new Map<string, RawChunkRow>();
 
+  // Full-text search (Dutch stemming) ranked by ts_rank_cd; trigram word similarity as fuzzy fallback.
   const textRows = (await db.execute(sql`
     select c.id, c.document_id, d.title, d.source_url, d.version_date::text as version_date, c.heading, c.content,
-           similarity(c.content, ${q}) as sim
+           ts_rank_cd(to_tsvector('dutch', coalesce(c.heading, '') || ' ' || c.content), websearch_to_tsquery('dutch', ${q})) as sim
     from knowledge_chunks c
     join knowledge_documents d on d.id = c.document_id
     where (c.organization_id is null or c.organization_id = ${opts.orgId})
       and d.status = 'actief'
-      and (c.content % ${q} or c.content ilike ${"%" + q.slice(0, 60) + "%"})
+      and to_tsvector('dutch', coalesce(c.heading, '') || ' ' || c.content) @@ websearch_to_tsquery('dutch', ${q})
     order by sim desc
     limit ${candidates}
   `)) as unknown as Array<RawChunkRow & { sim: number }>;
+  if (textRows.length < 3) {
+    // Relax to OR-semantics over the query terms.
+    const orQuery = q
+      .split(/\s+/)
+      .filter((w) => w.length > 2)
+      .join(" or ");
+    if (orQuery) {
+      const relaxed = (await db.execute(sql`
+        select c.id, c.document_id, d.title, d.source_url, d.version_date::text as version_date, c.heading, c.content,
+               ts_rank_cd(to_tsvector('dutch', coalesce(c.heading, '') || ' ' || c.content), websearch_to_tsquery('dutch', ${orQuery})) as sim
+        from knowledge_chunks c
+        join knowledge_documents d on d.id = c.document_id
+        where (c.organization_id is null or c.organization_id = ${opts.orgId})
+          and d.status = 'actief'
+          and to_tsvector('dutch', coalesce(c.heading, '') || ' ' || c.content) @@ websearch_to_tsquery('dutch', ${orQuery})
+        order by sim desc
+        limit ${candidates}
+      `)) as unknown as Array<RawChunkRow & { sim: number }>;
+      for (const r of relaxed) if (!textRows.some((t) => t.id === r.id)) textRows.push(r);
+    }
+  }
+  if (textRows.length < 3) {
+    const fuzzy = (await db.execute(sql`
+      select c.id, c.document_id, d.title, d.source_url, d.version_date::text as version_date, c.heading, c.content,
+             word_similarity(${q}, c.content) as sim
+      from knowledge_chunks c
+      join knowledge_documents d on d.id = c.document_id
+      where (c.organization_id is null or c.organization_id = ${opts.orgId})
+        and d.status = 'actief'
+        and ${q} <% c.content
+      order by sim desc
+      limit ${candidates}
+    `)) as unknown as Array<RawChunkRow & { sim: number }>;
+    for (const r of fuzzy) if (!textRows.some((t) => t.id === r.id)) textRows.push(r);
+  }
   lists.push(textRows.map((r, i) => ({ id: r.id, rank: i + 1 })));
   for (const r of textRows) rowsById.set(r.id, r);
 
