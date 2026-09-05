@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ActionForm } from "@/components/shared/action-form";
-import { Field, SelectField, TextAreaField, TextField } from "@/components/shared/form-fields";
+import { Field, SelectField, TextField } from "@/components/shared/form-fields";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DOCUMENT_TYPE_LABELS } from "@/lib/labels";
 import type { ActionResult } from "@/lib/action-result";
@@ -100,30 +100,6 @@ export function UploadDocumentDialog({ action, types }: { action: (fd: FormData)
             <input id="file" name="file" type="file" className="block w-full text-sm" required />
           </Field>
           <SubmitButton pendingText="Uploaden...">Uploaden</SubmitButton>
-        </ActionForm>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function ManualDocumentDialog({ action, types, initial }: { action: (fd: FormData) => Promise<ActionResult<unknown>>; types: string[]; initial?: { type: string; title: string; body: string } }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" variant="outline">{initial ? "Handmatig bewerken" : "Handmatig opstellen"}</Button>} />
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{initial ? "Nieuwe versie handmatig" : "Document handmatig opstellen"}</DialogTitle>
-          <DialogDescription>Gebruik koppen met # voor secties en - voor opsommingen. Het document wordt als docx en pdf gerenderd.</DialogDescription>
-        </DialogHeader>
-        <ActionForm action={action} className="space-y-4" successMessage="Document opgeslagen" onSuccess={() => setOpen(false)}>
-          <div className="grid gap-4 md:grid-cols-2">
-            <SelectField label="Type" name="type" options={types.map((t) => ({ value: t, label: DOCUMENT_TYPE_LABELS[t] ?? t }))} defaultValue={initial?.type ?? "projectplan"} required />
-            <TextField label="Titel" name="title" defaultValue={initial?.title} required />
-          </div>
-          <TextAreaField label="Inhoud" name="body" defaultValue={initial?.body} rows={16} required />
-          {initial ? <TextField label="Wijzigingsnotitie" name="changeNote" /> : null}
-          <SubmitButton pendingText="Opslaan...">Opslaan</SubmitButton>
         </ActionForm>
       </DialogContent>
     </Dialog>

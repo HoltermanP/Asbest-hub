@@ -231,27 +231,3 @@ export function UploadTenderDocumentDialog({ action, kinds }: { action: (fd: For
     </Dialog>
   );
 }
-
-export function ManualTenderDocumentDialog({ action, kinds, initial }: { action: (fd: FormData) => Promise<ActionResult<unknown>>; kinds: string[]; initial?: { kind: string; title: string; body: string } }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" variant="outline">{initial ? "Handmatig bewerken" : "Handmatig opstellen"}</Button>} />
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>{initial ? "Nieuwe versie handmatig" : "Stuk handmatig opstellen"}</DialogTitle>
-          <DialogDescription>Gebruik # voor koppen en - voor opsommingen.</DialogDescription>
-        </DialogHeader>
-        <ActionForm action={action} className="space-y-3" successMessage="Opgeslagen" onSuccess={() => setOpen(false)}>
-          <div className="grid gap-3 md:grid-cols-2">
-            <SelectField label="Soort" name="kind" options={kinds.map((k) => ({ value: k, label: TENDER_DOC_KIND_LABELS[k] ?? k }))} defaultValue={initial?.kind ?? "overig"} required />
-            <TextField label="Titel" name="title" defaultValue={initial?.title} required />
-          </div>
-          <TextAreaField label="Inhoud" name="body" defaultValue={initial?.body} rows={16} required />
-          {initial ? <TextField label="Wijzigingsnotitie" name="changeNote" /> : null}
-          <SubmitButton pendingText="Opslaan...">Opslaan</SubmitButton>
-        </ActionForm>
-      </DialogContent>
-    </Dialog>
-  );
-}

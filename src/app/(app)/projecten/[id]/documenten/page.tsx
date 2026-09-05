@@ -7,9 +7,9 @@ import { ApproveButton, RequestApprovalButton } from "@/components/shared/approv
 import { JobProgress } from "@/components/shared/job-progress";
 import { Section } from "@/components/shared/page-header";
 import { ConfidenceBadge, StatusBadge } from "@/components/shared/status-badge";
-import { GenerateDocumentDialog, ManualDocumentDialog, UploadDocumentDialog } from "@/components/projects/document-forms";
+import { GenerateDocumentDialog, UploadDocumentDialog } from "@/components/projects/document-forms";
 import { decideApprovalAction } from "@/actions/approvals";
-import { generateDocumentAction, requestDocumentApprovalAction, saveManualDocumentAction, uploadDocumentAction } from "@/actions/projects";
+import { generateDocumentAction, requestDocumentApprovalAction, uploadDocumentAction } from "@/actions/projects";
 import { DOCUMENT_TYPES } from "@/ai/agents/document-author";
 import { requirePermission } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
@@ -54,7 +54,7 @@ export default async function DocumentsPage({ params }: { params: Promise<{ id: 
           writable ? (
             <>
               {canAi ? <GenerateDocumentDialog documentTypes={[...DOCUMENT_TYPES]} generate={generate} /> : null}
-              <ManualDocumentDialog action={saveManualDocumentAction.bind(null, id, null)} types={ALL_TYPES} />
+              <Button size="sm" variant="outline" render={<Link href={`/projecten/${id}/documenten/nieuw`}>Handmatig opstellen</Link>} />
               <UploadDocumentDialog action={uploadDocumentAction.bind(null, id)} types={ALL_TYPES} />
             </>
           ) : null
@@ -97,6 +97,7 @@ export default async function DocumentsPage({ params }: { params: Promise<{ id: 
                             {d.docxUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.docxUrl, `${d.title}.docx`)}>docx</a>} /> : null}
                             {d.pdfUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.pdfUrl, `${d.title}.pdf`)}>pdf</a>} /> : null}
                             {d.fileUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.fileUrl, d.fileName ?? undefined)}>bestand</a>} /> : null}
+                            {writable && d.content ? <Button size="sm" variant="ghost" render={<Link href={`/projecten/${id}/documenten/${d.id}/bewerken`}>Bewerken</Link>} /> : null}
                             {writable && d.status === "concept" && !approval && !jobIsActive(projectJobs.find((j) => j.id === d.jobId)) ? (
                               <RequestApprovalButton request={requestDocumentApprovalAction.bind(null, d.id)} />
                             ) : null}

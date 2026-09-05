@@ -17,6 +17,7 @@ import {
   WidthType,
 } from "docx";
 import { provenanceLine } from "../approvals/types";
+import { parseInline } from "./inline";
 import type { DocBlock, DocSection, StructuredDocument } from "./types";
 
 const FONT = "Calibri";
@@ -26,14 +27,18 @@ function heading(text: string, level: 1 | 2 | 3): Paragraph {
   return new Paragraph({ text, heading: map[level], spacing: { before: level === 1 ? 320 : 200, after: 120 } });
 }
 
+function runs(text: string, size = 21, extra: { italics?: boolean; color?: string } = {}): TextRun[] {
+  return parseInline(text).map((r) => new TextRun({ text: r.text, font: FONT, size, bold: r.bold, italics: r.italic || extra.italics, color: extra.color }));
+}
+
 function blockToParagraphs(block: DocBlock): Array<Paragraph | Table> {
   switch (block.type) {
     case "paragraph":
-      return [new Paragraph({ children: [new TextRun({ text: block.text ?? "", font: FONT, size: 21 })], spacing: { after: 120 } })];
+      return [new Paragraph({ children: runs(block.text ?? ""), spacing: { after: 120 } })];
     case "note":
       return [
         new Paragraph({
-          children: [new TextRun({ text: block.text ?? "", font: FONT, size: 20, italics: true })],
+          children: runs(block.text ?? "", 20, { italics: true }),
           shading: { type: ShadingType.CLEAR, fill: "EAF1FD" },
           border: { left: { style: BorderStyle.SINGLE, size: 12, color: "2D6FE8" } },
           spacing: { after: 160 },
@@ -41,13 +46,13 @@ function blockToParagraphs(block: DocBlock): Array<Paragraph | Table> {
       ];
     case "bullets":
       return (block.items ?? []).map(
-        (item) => new Paragraph({ children: [new TextRun({ text: item, font: FONT, size: 21 })], bullet: { level: 0 }, spacing: { after: 60 } }),
+        (item) => new Paragraph({ children: runs(item), bullet: { level: 0 }, spacing: { after: 60 } }),
       );
     case "numbered":
       return (block.items ?? []).map(
         (item) =>
           new Paragraph({
-            children: [new TextRun({ text: item, font: FONT, size: 21 })],
+            children: runs(item),
             numbering: { reference: "numbered", level: 0 },
             spacing: { after: 60 },
           }),

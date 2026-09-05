@@ -32,6 +32,7 @@ import { STANDARD_PHASES } from "@/lib/phases";
 import { assertUploadSize, putFile, virusScanner } from "@/lib/storage";
 import { extractDocumentText } from "@/lib/text-extract";
 import { DOCUMENT_TYPES } from "@/ai/agents/document-author";
+import { editorPayloadSchema, type EditorPayloadInput } from "@/lib/documents/editor-schema";
 
 function str(fd: FormData, key: string): string {
   const v = fd.get(key);
@@ -529,6 +530,38 @@ export async function saveManualDocumentAction(projectId: string, documentId: st
     });
     revalidatePath(`/projecten/${projectId}/documenten`);
     return { id: row.id };
+  });
+}
+
+/** Saves a document from the Word-like editor as a new document or a new version (rendered to docx and pdf). */
+export async function saveEditedDocumentAction(projectId: string, documentId: string | null, payload: EditorPayloadInput) {
+  return runAction(async () => {
+    const ctx = await requirePermission("project:write");
+    const project = await loadProject(ctx.orgId, projectId);
+    const d = editorPayloadSchema.parse(payload);
+    const type = z.enum([...DOCUMENT_TYPES, "eindcontrole_nen2990", "vrijgavecertificaat", "overig"]).parse(d.type);
+    let previous: typeof documents.$inferSelect | undefined;
+    if (documentId) {
+      previous = await db.query.documents.findFirst({ where: and(eq(documents.id, documentId), eq(documents.organizationId, ctx.orgId), eq(documents.projectId, projectId)) });
+      if (!previous) throw new NotFoundError("Document niet gevonden");
+    }
+    const row = await saveProjectDocument({
+      orgId: ctx.orgId,
+      userId: ctx.userId,
+      projectId,
+      type: previous ? previous.type : type,
+      title: d.title,
+      content: { title: d.title, subtitle: d.subtitle, reference: project.projectNumber, summary: d.summary, sections: d.sections },
+      generatedBy: "mens",
+      model: null,
+      aiSources: previous?.aiSources ?? [],
+      aiConfidence: null,
+      existingDocumentId: documentId,
+      changeNote: d.changeNote ?? (previous ? `Handmatig bewerkt op basis van v${previous.version}` : null),
+    });
+    await audit({ orgId: ctx.orgId, actor: ctx.actor, action: documentId ? "document.edited" : "document.created", entityType: "document", entityId: row.id, details: { version: row.version } });
+    revalidatePath(`/projecten/${projectId}/documenten`);
+    return { id: row.id, href: `/projecten/${projectId}/documenten/${row.id}` };
   });
 }
 

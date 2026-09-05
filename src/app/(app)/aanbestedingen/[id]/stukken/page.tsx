@@ -8,9 +8,9 @@ import { JobProgress } from "@/components/shared/job-progress";
 import { Section } from "@/components/shared/page-header";
 import { ConfidenceBadge, StatusBadge } from "@/components/shared/status-badge";
 import { GenerateTenderDocDialog } from "@/components/tenders/generate-tender-doc";
-import { ManualTenderDocumentDialog, UploadTenderDocumentDialog } from "@/components/tenders/tender-forms";
+import { UploadTenderDocumentDialog } from "@/components/tenders/tender-forms";
 import { decideApprovalAction } from "@/actions/approvals";
-import { generateTenderDocumentAction, requestTenderDocumentApprovalAction, saveManualTenderDocumentAction, uploadTenderDocumentAction } from "@/actions/tenders";
+import { generateTenderDocumentAction, requestTenderDocumentApprovalAction, uploadTenderDocumentAction } from "@/actions/tenders";
 import { TENDER_DOC_KINDS } from "@/ai/agents/tender-author";
 import { requirePermission } from "@/lib/auth";
 import { formatDateTime } from "@/lib/format";
@@ -49,7 +49,7 @@ export default async function TenderDocumentsPage({ params }: { params: Promise<
           writable ? (
             <>
               {can(ctx.role, "ai:run") ? <GenerateTenderDocDialog kinds={[...PREP_KINDS]} generate={generate} /> : null}
-              <ManualTenderDocumentDialog action={saveManualTenderDocumentAction.bind(null, id, null)} kinds={ALL_KINDS} />
+              <Button size="sm" variant="outline" render={<Link href={`/aanbestedingen/${id}/stukken/nieuw`}>Handmatig opstellen</Link>} />
               <UploadTenderDocumentDialog action={uploadTenderDocumentAction.bind(null, id)} kinds={ALL_KINDS} />
             </>
           ) : null
@@ -92,6 +92,7 @@ export default async function TenderDocumentsPage({ params }: { params: Promise<
                             {d.pdfUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.pdfUrl, `${d.title}.pdf`)}>pdf</a>} /> : null}
                             {d.xlsxUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.xlsxUrl, `${d.title}.xlsx`)}>xlsx</a>} /> : null}
                             {d.fileUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(d.fileUrl, d.fileName ?? undefined)}>bestand</a>} /> : null}
+                            {writable && d.content ? <Button size="sm" variant="ghost" render={<Link href={`/aanbestedingen/${id}/stukken/${d.id}/bewerken`}>Bewerken</Link>} /> : null}
                             {writable && d.status === "concept" && !approval && !jobIsActive(active.find((j) => j.id === d.jobId)) ? <RequestApprovalButton request={requestTenderDocumentApprovalAction.bind(null, d.id)} /> : null}
                             {approval && can(ctx.role, "approval:decide") ? <ApproveButton approvalId={approval.id} label={approval.entityLabel} summary={[{ label: "Versie", value: String(d.version) }, { label: "Aangevraagd door", value: approval.requestedByName }]} decide={decideApprovalAction} /> : null}
                           </div>

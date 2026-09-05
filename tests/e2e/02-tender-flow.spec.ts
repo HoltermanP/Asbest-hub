@@ -57,11 +57,19 @@ test.describe("Aanbestedingsflow", () => {
       await page.getByRole("button", { name: "Start generatie" }).click();
       await waitForJob(page);
     } else {
-      await page.getByRole("button", { name: "Handmatig opstellen" }).click();
-      await page.getByLabel("Soort").selectOption("aanbestedingsleidraad");
+      await page.getByRole("link", { name: "Handmatig opstellen" }).click();
+      await page.waitForURL(/\/stukken\/nieuw/);
+      await page.getByLabel("Documenttype").selectOption("aanbestedingsleidraad");
       await page.getByLabel("Titel").fill("Aanbestedingsleidraad E2E");
-      await page.getByLabel("Inhoud").fill("# Inleiding\n\nLeidraad voor de e2e-test.");
-      await page.getByRole("button", { name: "Opslaan" }).click();
+      await page.locator(".asbesthub-editor").click();
+      await page.keyboard.type("Inleiding");
+      await page.getByRole("button", { name: "Hoofdstuk (kop 1)" }).click();
+      await page.keyboard.press("End");
+      await page.keyboard.press("Enter");
+      await page.keyboard.type("Leidraad voor de e2e-test.");
+      await page.getByRole("button", { name: "Document opslaan" }).click();
+      await page.waitForURL(/\/stukken\/[0-9a-f-]+$/);
+      await page.goto(`${tenderUrl}/stukken`);
       await expect(page.getByText("Aanbestedingsleidraad E2E")).toBeVisible();
       await page.getByRole("button", { name: "Ter accordering aanbieden" }).first().click();
       await page.reload();

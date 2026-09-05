@@ -21,6 +21,7 @@ import { validateWeights } from "@/lib/scoring";
 import { assertUploadSize, putFile, virusScanner } from "@/lib/storage";
 import { adviseProcedure } from "@/lib/thresholds";
 import { TENDER_DOC_KINDS } from "@/ai/agents/tender-author";
+import { editorPayloadSchema, type EditorPayloadInput } from "@/lib/documents/editor-schema";
 
 function str(fd: FormData, key: string): string {
   const v = fd.get(key);
@@ -316,6 +317,39 @@ export async function saveManualTenderDocumentAction(tenderId: string, documentI
     });
     revalidatePath(`/aanbestedingen/${tenderId}/stukken`);
     return { id: row.id };
+  });
+}
+
+/** Saves a tender document from the Word-like editor as a new document or a new version. */
+export async function saveEditedTenderDocumentAction(tenderId: string, documentId: string | null, payload: EditorPayloadInput) {
+  return runAction(async () => {
+    const ctx = await requirePermission("tender:write");
+    const t = await loadTender(ctx.orgId, tenderId);
+    const d = editorPayloadSchema.parse(payload);
+    const kind = z.enum([...TENDER_DOC_KINDS, "gunningsbrief", "afwijzingsbrief", "overig"]).parse(d.type);
+    let previous: typeof tenderDocuments.$inferSelect | undefined;
+    if (documentId) {
+      previous = await db.query.tenderDocuments.findFirst({ where: and(eq(tenderDocuments.id, documentId), eq(tenderDocuments.organizationId, ctx.orgId), eq(tenderDocuments.tenderId, tenderId)) });
+      if (!previous) throw new NotFoundError("Stuk niet gevonden");
+    }
+    const row = await saveTenderDocument({
+      orgId: ctx.orgId,
+      userId: ctx.userId,
+      tenderId,
+      kind: previous ? previous.kind : kind,
+      title: d.title,
+      content: { title: d.title, subtitle: d.subtitle ?? `${t.title} (${t.referenceNumber})`, reference: t.referenceNumber, summary: d.summary, sections: d.sections },
+      generatedBy: "mens",
+      model: null,
+      aiSources: previous?.aiSources ?? [],
+      aiConfidence: null,
+      existingDocumentId: documentId,
+      changeNote: d.changeNote ?? (previous ? `Handmatig bewerkt op basis van v${previous.version}` : null),
+      relatedBidId: previous?.relatedBidId ?? null,
+    });
+    await audit({ orgId: ctx.orgId, actor: ctx.actor, action: documentId ? "tender_document.edited" : "tender_document.created", entityType: "tender_document", entityId: row.id, details: { version: row.version } });
+    revalidatePath(`/aanbestedingen/${tenderId}/stukken`);
+    return { id: row.id, href: `/aanbestedingen/${tenderId}/stukken/${row.id}` };
   });
 }
 

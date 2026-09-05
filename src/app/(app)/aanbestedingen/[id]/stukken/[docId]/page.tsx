@@ -12,12 +12,11 @@ import { Section } from "@/components/shared/page-header";
 import { SourcesList } from "@/components/shared/sources-list";
 import { ConfidenceBadge, StatusBadge } from "@/components/shared/status-badge";
 import { GenerateTenderDocDialog } from "@/components/tenders/generate-tender-doc";
-import { ManualTenderDocumentDialog } from "@/components/tenders/tender-forms";
 import { decideApprovalAction } from "@/actions/approvals";
-import { generateTenderDocumentAction, requestTenderDocumentApprovalAction, saveManualTenderDocumentAction } from "@/actions/tenders";
+import { generateTenderDocumentAction, requestTenderDocumentApprovalAction } from "@/actions/tenders";
 import { TENDER_DOC_KINDS } from "@/ai/agents/tender-author";
 import { requirePermission } from "@/lib/auth";
-import { diffDocuments, documentToText } from "@/lib/documents/diff";
+import { diffDocuments } from "@/lib/documents/diff";
 import { formatDateTime } from "@/lib/format";
 import { getJob, jobIsActive } from "@/lib/jobs";
 import { DOCUMENT_STATUS_LABELS, TENDER_DOC_KIND_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/labels";
@@ -54,7 +53,7 @@ export default async function TenderDocumentDetailPage({ params, searchParams }:
           {doc.pdfUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(doc.pdfUrl, `${doc.title}.pdf`)}>pdf</a>} /> : null}
           {doc.xlsxUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(doc.xlsxUrl, `${doc.title}.xlsx`)}>xlsx</a>} /> : null}
           {writable && isGen && can(ctx.role, "ai:run") && !jobIsActive(job) ? <GenerateTenderDocDialog kinds={[doc.kind]} fixedKind={doc.kind} existingDocumentId={doc.id} generate={generateTenderDocumentAction.bind(null, id)} triggerLabel="Nieuwe versie (AI)" /> : null}
-          {writable && doc.content ? <ManualTenderDocumentDialog action={saveManualTenderDocumentAction.bind(null, id, doc.id)} kinds={[doc.kind]} initial={{ kind: doc.kind, title: doc.title, body: documentToText(doc.content).split("\n").slice(1).join("\n") }} /> : null}
+          {writable && doc.content ? <Button size="sm" variant="outline" render={<Link href={`/aanbestedingen/${id}/stukken/${doc.id}/bewerken`}>Bewerken in editor</Link>} /> : null}
           {writable && doc.status === "concept" && !open && !jobIsActive(job) ? <RequestApprovalButton request={requestTenderDocumentApprovalAction.bind(null, doc.id)} /> : null}
           {open && can(ctx.role, "approval:decide") ? <ApproveButton approvalId={open.id} label={open.entityLabel} summary={[{ label: "Titel", value: doc.title }, { label: "Versie", value: String(doc.version) }, { label: "Aangevraagd door", value: open.requestedByName }]} decide={decideApprovalAction} /> : null}
         </div>

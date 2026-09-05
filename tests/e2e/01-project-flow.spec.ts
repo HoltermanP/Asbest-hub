@@ -62,11 +62,20 @@ test.describe("Projectflow", () => {
       await waitForJob(page);
       await expect(page.getByText(/Projectplan/).first()).toBeVisible();
     } else {
-      await page.getByRole("button", { name: "Handmatig opstellen" }).click();
+      await page.getByRole("link", { name: "Handmatig opstellen" }).click();
+      await page.waitForURL(/\/documenten\/nieuw/);
       await page.getByLabel("Titel").fill("Projectplan E2E");
-      await page.getByLabel("Inhoud").fill("# Inleiding\n\nDit is een e2e-projectplan.\n\n- punt een\n- punt twee");
-      await page.getByRole("button", { name: "Opslaan" }).click();
-      await expect(page.getByText("Projectplan E2E")).toBeVisible();
+      const editor = page.locator(".asbesthub-editor");
+      await editor.click();
+      await page.keyboard.type("Inleiding");
+      await page.getByRole("button", { name: "Hoofdstuk (kop 1)" }).click();
+      await page.keyboard.press("End");
+      await page.keyboard.press("Enter");
+      await page.keyboard.type("Dit is een e2e-projectplan met een opsomming.");
+      await page.getByRole("button", { name: "Document opslaan" }).click();
+      await page.waitForURL(/\/documenten\/[0-9a-f-]+$/);
+      await expect(page.getByText("Projectplan E2E").first()).toBeVisible();
+      await page.goto(`${projectUrl}/documenten`);
       await page.getByRole("button", { name: "Ter accordering aanbieden" }).first().click();
       await expect(page.getByText(/Accorderingsverzoek aangemaakt/)).toBeVisible();
     }

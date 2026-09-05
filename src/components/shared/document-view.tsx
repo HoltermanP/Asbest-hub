@@ -1,5 +1,14 @@
 import type { StructuredDocument } from "@/lib/documents/types";
 import { provenanceLine } from "@/lib/approvals/types";
+import { parseInline } from "@/lib/documents/inline";
+
+function Inline({ text }: { text: string }) {
+  return (
+    <>
+      {parseInline(text).map((r, i) => (r.bold ? <strong key={i}>{r.text}</strong> : r.italic ? <em key={i}>{r.text}</em> : <span key={i}>{r.text}</span>))}
+    </>
+  );
+}
 
 /** Renders a structured document inline (HTML), matching the DOCX/PDF layout. */
 export function DocumentView({ doc }: { doc: StructuredDocument }) {
@@ -17,18 +26,18 @@ export function DocumentView({ doc }: { doc: StructuredDocument }) {
           <section key={i} className="mt-4">
             <Tag className="font-heading font-semibold">{s.heading}</Tag>
             {s.blocks.map((b, j) => {
-              if (b.type === "paragraph") return <p key={j}>{b.text}</p>;
+              if (b.type === "paragraph") return <p key={j}><Inline text={b.text ?? ""} /></p>;
               if (b.type === "note")
                 return (
                   <p key={j} className="border-l-4 border-ai-blue bg-accent p-2 text-sm">
-                    {b.text}
+                    <Inline text={b.text ?? ""} />
                   </p>
                 );
               if (b.type === "bullets")
                 return (
                   <ul key={j} className="list-disc pl-5">
                     {(b.items ?? []).map((it, k) => (
-                      <li key={k}>{it}</li>
+                      <li key={k}><Inline text={it} /></li>
                     ))}
                   </ul>
                 );
@@ -36,7 +45,7 @@ export function DocumentView({ doc }: { doc: StructuredDocument }) {
                 return (
                   <ol key={j} className="list-decimal pl-5">
                     {(b.items ?? []).map((it, k) => (
-                      <li key={k}>{it}</li>
+                      <li key={k}><Inline text={it} /></li>
                     ))}
                   </ol>
                 );
@@ -58,7 +67,7 @@ export function DocumentView({ doc }: { doc: StructuredDocument }) {
                           <tr key={k}>
                             {r.cells.map((c, m) => (
                               <td key={m} className="border-b px-2 py-1 align-top">
-                                {c}
+                                <Inline text={c} />
                               </td>
                             ))}
                           </tr>

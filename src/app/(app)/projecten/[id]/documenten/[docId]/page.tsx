@@ -10,13 +10,13 @@ import { JobProgress } from "@/components/shared/job-progress";
 import { Section } from "@/components/shared/page-header";
 import { SourcesList } from "@/components/shared/sources-list";
 import { ConfidenceBadge, StatusBadge } from "@/components/shared/status-badge";
-import { GenerateDocumentDialog, ManualDocumentDialog } from "@/components/projects/document-forms";
+import { GenerateDocumentDialog } from "@/components/projects/document-forms";
 import { DiffView } from "@/components/shared/diff-view";
 import { decideApprovalAction } from "@/actions/approvals";
-import { generateDocumentAction, requestDocumentApprovalAction, saveManualDocumentAction } from "@/actions/projects";
+import { generateDocumentAction, requestDocumentApprovalAction } from "@/actions/projects";
 import { DOCUMENT_TYPES } from "@/ai/agents/document-author";
 import { requirePermission } from "@/lib/auth";
-import { diffDocuments, documentToText } from "@/lib/documents/diff";
+import { diffDocuments } from "@/lib/documents/diff";
 import { formatDateTime } from "@/lib/format";
 import { getJob, jobIsActive } from "@/lib/jobs";
 import { DOCUMENT_STATUS_LABELS, DOCUMENT_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/labels";
@@ -60,9 +60,7 @@ export default async function DocumentDetailPage({ params, searchParams }: { par
           {writable && isGenType && can(ctx.role, "ai:run") && !jobIsActive(job) ? (
             <GenerateDocumentDialog documentTypes={[doc.type]} fixedType={doc.type} existingDocumentId={doc.id} generate={generateDocumentAction.bind(null, id)} triggerLabel="Nieuwe versie (AI)" />
           ) : null}
-          {writable && doc.content ? (
-            <ManualDocumentDialog action={saveManualDocumentAction.bind(null, id, doc.id)} types={[doc.type]} initial={{ type: doc.type, title: doc.title, body: documentToText(doc.content).split("\n").slice(1).join("\n") }} />
-          ) : null}
+          {writable && doc.content ? <Button size="sm" variant="outline" render={<Link href={`/projecten/${id}/documenten/${doc.id}/bewerken`}>Bewerken in editor</Link>} /> : null}
           {writable && doc.status === "concept" && !open && !jobIsActive(job) ? <RequestApprovalButton request={requestDocumentApprovalAction.bind(null, doc.id)} /> : null}
           {open && can(ctx.role, "approval:decide") ? (
             <ApproveButton approvalId={open.id} label={open.entityLabel} summary={[{ label: "Titel", value: doc.title }, { label: "Versie", value: String(doc.version) }, { label: "Aangevraagd door", value: open.requestedByName }]} decide={decideApprovalAction} />

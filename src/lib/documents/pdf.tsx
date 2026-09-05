@@ -3,6 +3,7 @@ import React from "react";
 import { Document, Font, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import type { DocBlock, DocSection, StructuredDocument } from "./types";
 import { provenanceLine } from "../approvals/types";
+import { parseInline } from "./inline";
 
 Font.registerHyphenationCallback((word) => [word]);
 
@@ -30,14 +31,32 @@ const styles = StyleSheet.create({
   summary: { marginBottom: 12, padding: 8, backgroundColor: "#F3F5F9" },
 });
 
+function Inline({ text }: { text: string }) {
+  return (
+    <>
+      {parseInline(text).map((r, i) => (
+        <Text key={i} style={{ fontFamily: r.bold ? "Helvetica-Bold" : r.italic ? "Helvetica-Oblique" : "Helvetica" }}>
+          {r.text}
+        </Text>
+      ))}
+    </>
+  );
+}
+
 function Block({ block }: { block: DocBlock }) {
   switch (block.type) {
     case "paragraph":
-      return <Text style={styles.paragraph}>{block.text ?? ""}</Text>;
+      return (
+        <Text style={styles.paragraph}>
+          <Inline text={block.text ?? ""} />
+        </Text>
+      );
     case "note":
       return (
         <View style={styles.note}>
-          <Text>{block.text ?? ""}</Text>
+          <Text>
+            <Inline text={block.text ?? ""} />
+          </Text>
         </View>
       );
     case "bullets":
@@ -47,7 +66,9 @@ function Block({ block }: { block: DocBlock }) {
           {(block.items ?? []).map((item, i) => (
             <View key={i} style={styles.bullet}>
               <Text style={styles.bulletMark}>{block.type === "numbered" ? `${i + 1}.` : "•"}</Text>
-              <Text style={styles.bulletText}>{item}</Text>
+              <Text style={styles.bulletText}>
+                <Inline text={item} />
+              </Text>
             </View>
           ))}
         </View>
@@ -68,7 +89,7 @@ function Block({ block }: { block: DocBlock }) {
             <View key={ri} style={styles.tableRow} wrap={false}>
               {r.cells.map((c, ci) => (
                 <Text key={ci} style={styles.tableCell}>
-                  {c}
+                  <Inline text={c} />
                 </Text>
               ))}
             </View>
