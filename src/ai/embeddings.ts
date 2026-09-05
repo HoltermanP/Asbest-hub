@@ -48,6 +48,17 @@ export async function embedTexts(texts: string[], ctx: { orgId: string; actor: A
   return out;
 }
 
+/** Like embedTexts but returns null (and logs) when the embedding service fails, so ingestion can continue text-only. */
+export async function tryEmbedTexts(texts: string[], ctx: { orgId: string; actor: Actor }): Promise<number[][] | null> {
+  if (!embeddingsAvailable() || texts.length === 0) return null;
+  try {
+    return await embedTexts(texts, ctx);
+  } catch (err) {
+    console.warn("[embeddings] mislukt, doorgaan zonder vectoren:", err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
 export async function embedQuery(text: string, ctx: { orgId: string; actor: Actor }): Promise<number[]> {
   const [v] = await embedTexts([text], ctx);
   if (!v) throw new Error("Embedding mislukt");

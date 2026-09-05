@@ -9,6 +9,7 @@ import { requirePermission, visibleTenderIds } from "@/lib/auth";
 import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Aanbestedingen" };
 
 export default async function TendersPage() {
   const ctx = await requirePermission("tender:read");

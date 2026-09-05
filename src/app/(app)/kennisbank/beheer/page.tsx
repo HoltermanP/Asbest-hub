@@ -13,6 +13,7 @@ import { formatDateTime } from "@/lib/format";
 import { KNOWLEDGE_SOURCES, sourceIsStale } from "@/lib/knowledge";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Kennisbank beheren" };
 
 const CATEGORIES = ["wet", "omgevingswet", "arbo", "certificering", "lavs", "handhaving", "normen", "afval", "techniek", "aanbesteden", "overig"];
 
@@ -54,7 +55,7 @@ export default async function KnowledgeAdminPage() {
                     <td className="py-2 pr-2 text-xs">{d.category}</td>
                     <td className="py-2 pr-2 font-mono text-xs">{d.versionLabel ?? "-"}<span className="block text-muted-foreground">{formatDateTime(d.fetchedAt)}</span></td>
                     <td className="py-2 pr-2 text-right font-mono text-xs">{d.chunkCount}</td>
-                    <td className="py-2 pr-2"><span className="flex gap-1"><StatusBadge value={d.status === "actief" ? "geaccordeerd" : "afgewezen"} label={d.status} />{sourceIsStale(d.versionDate, d.fetchedAt) ? <StatusBadge value="ter_accordering" label="> 12 mnd" /> : null}</span>{d.error ? <span className="block text-[11px] text-velocity">{d.error}</span> : null}</td>
+                    <td className="py-2 pr-2"><span className="flex gap-1"><StatusBadge value={d.status === "actief" ? "geaccordeerd" : d.status === "indexeren" ? "bezig" : "afgewezen"} label={d.status === "actief" ? "Actief" : d.status === "indexeren" ? "Indexeren" : "Fout"} />{sourceIsStale(d.versionDate, d.fetchedAt) ? <StatusBadge value="ter_accordering" label="> 12 mnd" /> : null}</span>{d.error ? <span className="block text-[11px] text-velocity">{d.error}</span> : null}</td>
                     <td className="py-2 text-right whitespace-nowrap">
                       <span className="inline-flex gap-1">
                         <ActionButton action={reindexSourceAction.bind(null, d.id)} variant="ghost" successMessage="Geherindexeerd">Herindexeren</ActionButton>

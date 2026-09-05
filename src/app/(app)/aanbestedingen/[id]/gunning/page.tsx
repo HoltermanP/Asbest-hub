@@ -14,7 +14,7 @@ import { requestAdviceApprovalAction, runAwardAdvisorAction } from "@/actions/as
 import { assertTenderAccess, requirePermission } from "@/lib/auth";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import { jobIsActive } from "@/lib/jobs";
-import { AWARD_METHOD_LABELS, TENDER_DOC_KIND_LABELS } from "@/lib/labels";
+import { AWARD_METHOD_LABELS, DOCUMENT_STATUS_LABELS, TENDER_DOC_KIND_LABELS } from "@/lib/labels";
 import { can } from "@/lib/permissions";
 import { loadAssessmentData } from "@/lib/queries/assessment-data";
 import { fileDownloadPath } from "@/lib/storage";
@@ -50,7 +50,7 @@ export default async function AwardPage({ params }: { params: Promise<{ id: stri
         ) : (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge value={latest.status} label={latest.status === "geaccordeerd" ? `Geaccordeerd door ${latest.approvedByName} op ${formatDateTime(latest.approvedAt)}` : latest.status} />
+              <StatusBadge value={latest.status} label={latest.status === "geaccordeerd" ? `Geaccordeerd door ${latest.approvedByName} op ${formatDateTime(latest.approvedAt)}` : (DOCUMENT_STATUS_LABELS[latest.status] ?? latest.status)} />
               <ConfidenceBadge value={latest.confidence} />
               <span className="font-mono text-xs text-muted-foreground">v{latest.version} | {formatDateTime(latest.generatedAt)}</span>
               {can(ctx.role, "tender:write") && latest.status === "concept" && !approval ? <RequestApprovalButton request={requestAdviceApprovalAction.bind(null, latest.id)} /> : null}
@@ -110,7 +110,7 @@ export default async function AwardPage({ params }: { params: Promise<{ id: stri
                   <p className="text-xs text-muted-foreground">{TENDER_DOC_KIND_LABELS[l.kind]} v{l.version}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <StatusBadge value={l.status} label={l.status} />
+                  <StatusBadge value={l.status} label={DOCUMENT_STATUS_LABELS[l.status] ?? l.status} />
                   {l.docxUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(l.docxUrl, `${l.title}.docx`)}>docx</a>} /> : null}
                   {l.pdfUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(l.pdfUrl, `${l.title}.pdf`)}>pdf</a>} /> : null}
                 </div>

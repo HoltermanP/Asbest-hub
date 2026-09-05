@@ -149,7 +149,7 @@ interface ProjectDef {
 const PROJECTS: ProjectDef[] = [
   {
     nr: "PRJ-2026-001",
-    name: `Asbestsanering 40 woningen Meidoornlaan ${DEMO_MARK}`,
+    name: "Asbestsanering 40 woningen Meidoornlaan",
     client: "Woningcorporatie De Nieuwe Stad (fictief)",
     objectType: "woning",
     year: 1968,
@@ -226,7 +226,7 @@ const PROJECTS: ProjectDef[] = [
   },
   {
     nr: "PRJ-2026-002",
-    name: `Sanering spuitasbest sportcomplex De Kuil ${DEMO_MARK}`,
+    name: "Sanering spuitasbest sportcomplex De Kuil",
     client: "Gemeente Demostad (fictief)",
     objectType: "gebouw",
     year: 1974,
@@ -275,7 +275,7 @@ const PROJECTS: ProjectDef[] = [
   },
   {
     nr: "PRJ-2025-017",
-    name: `Bodemsanering asbestwegen Industriepad ${DEMO_MARK}`,
+    name: "Bodemsanering asbestwegen Industriepad",
     client: "Gemeente Demostad (fictief)",
     objectType: "bodem",
     year: null,
@@ -325,7 +325,7 @@ const PROJECTS: ProjectDef[] = [
   },
   {
     nr: "PRJ-2025-009",
-    name: `Plafondplaten basisschool De Regenboog ${DEMO_MARK}`,
+    name: "Plafondplaten basisschool De Regenboog",
     client: "Gemeente Demostad (fictief)",
     objectType: "gebouw",
     year: 1971,
@@ -378,7 +378,7 @@ const PROJECTS: ProjectDef[] = [
   },
   {
     nr: "PRJ-2024-031",
-    name: `Ketelhuis en installaties gemeentehuis ${DEMO_MARK}`,
+    name: "Ketelhuis en installaties gemeentehuis",
     client: "Gemeente Demostad (fictief)",
     objectType: "installatie",
     year: 1979,
@@ -429,7 +429,7 @@ const PROJECTS: ProjectDef[] = [
   },
   {
     nr: "PRJ-2026-004",
-    name: `Asbestcement waterleiding Polderweg ${DEMO_MARK}`,
+    name: "Asbestcement waterleiding Polderweg",
     client: "Netbeheerder Regio (fictief)",
     objectType: "infra",
     year: 1962,
@@ -463,7 +463,7 @@ async function storePdf(doc: C.SeedDocContent, key: string) {
 }
 
 function docContent(type: string, p: ProjectDef, version: number, calcLines: Array<{ activity: string; qty: number; unit: string; price: number; total: number; costType: string }>, sched: Array<{ name: string; start: string; end: string; critical: boolean }>): C.SeedDocContent {
-  const base = { name: p.name.replace(` ${DEMO_MARK}`, ""), nr: p.nr, client: p.client, loc: `${p.loc.adres}, ${p.loc.plaats}`, rc: p.rc, sources: p.sources, start: iso(p.startDays), end: iso(p.endDays), budget: p.budget };
+  const base = { name: p.name, nr: p.nr, client: p.client, loc: `${p.loc.adres}, ${p.loc.plaats}`, rc: p.rc, sources: p.sources, start: iso(p.startDays), end: iso(p.endDays), budget: p.budget };
   switch (type) {
     case "projectplan":
       return C.projectplan(base, version);
@@ -539,7 +539,7 @@ async function seedProject(p: ProjectDef) {
     const reportDate = daysFromNow(-inv.daysAgo);
     const validUntil = new Date(reportDate);
     validUntil.setFullYear(validUntil.getFullYear() + 3);
-    const report = C.investigationReport({ name: p.name.replace(` ${DEMO_MARK}`, ""), nr: p.nr, loc: `${p.loc.adres}, ${p.loc.plaats}`, year: p.year, agency: inv.agency, cert: inv.cert, date: toIsoDate(reportDate), sources: p.sources, recommendations: inv.recommendations, typeLabel: inv.type === "bodemonderzoek" ? "Bodemonderzoek NEN 5707" : "Asbestinventarisatie type A" });
+    const report = C.investigationReport({ name: p.name, nr: p.nr, loc: `${p.loc.adres}, ${p.loc.plaats}`, year: p.year, agency: inv.agency, cert: inv.cert, date: toIsoDate(reportDate), sources: p.sources, recommendations: inv.recommendations, typeLabel: inv.type === "bodemonderzoek" ? "Bodemonderzoek NEN 5707" : "Asbestinventarisatie type A" });
     const { stored, text } = await storePdf(report, `orgs/${orgId}/projects/${project.id}/investigations/inventarisatie-${p.nr}.pdf`);
     const [r] = await db
       .insert(investigations)
@@ -659,7 +659,7 @@ async function seedProject(p: ProjectDef) {
   for (const d of p.docs) {
     docDaysAgo -= 2;
     if (d.upload) {
-      const content = d.type === "eindcontrole_nen2990" ? C.eindcontroleRapport({ name: p.name.replace(` ${DEMO_MARK}`, ""), nr: p.nr, lab: "Laboratorium Luchtmeting Oost (fictief)", date: iso(-3), rooms: p.sources.map((s) => s.loc) }) : C.vrijgavecertificaat({ name: p.name.replace(` ${DEMO_MARK}`, ""), nr: p.nr, lab: "Laboratorium Luchtmeting Oost (fictief)", date: iso(-2) });
+      const content = d.type === "eindcontrole_nen2990" ? C.eindcontroleRapport({ name: p.name, nr: p.nr, lab: "Laboratorium Luchtmeting Oost (fictief)", date: iso(-3), rooms: p.sources.map((s) => s.loc) }) : C.vrijgavecertificaat({ name: p.name, nr: p.nr, lab: "Laboratorium Luchtmeting Oost (fictief)", date: iso(-2) });
       const { stored } = await storePdf(content, `orgs/${orgId}/projects/${project.id}/uploads/${d.type}-${p.nr}.pdf`);
       const [row2] = await db.insert(documents).values({ organizationId: orgId, createdBy: userId, projectId: project.id, type: d.type, title: content.title, status: d.status, fileUrl: stored.url, fileName: `${d.type}-${p.nr}.pdf`, generatedBy: "mens", generatedAt: daysFromNow(-docDaysAgo), approvedBy: d.status === "geaccordeerd" ? userId : null, approvedByName: d.status === "geaccordeerd" ? PL_NAME : null, approvedAt: d.status === "geaccordeerd" ? daysFromNow(-docDaysAgo + 1) : null }).returning();
       if (d.status === "geaccordeerd") await addApproval({ entityType: "document", entityId: row2!.id, label: `${content.title}`, projectId: project.id, status: "goedgekeurd", daysAgo: docDaysAgo });
@@ -709,7 +709,7 @@ const BIDDER_SCORES: Record<string, { ai: number[]; a1: number[]; a2: number[]; 
 const BIDDER_KEY = (name: string) => (name.includes("Noordwind") ? "Noordwind" : name.includes("Berg") ? "Van der Berg" : "Zuid-Holland");
 
 async function seedBid(tenderId: string, bidder: DemoBidder, tenderTitle: string, receivedAt: Date, status: (typeof bids.$inferInsert)["status"], withChecks: boolean, priceFactor = 1) {
-  const { embeddingsAvailable, embedTexts } = await import("@/ai/embeddings");
+  const { tryEmbedTexts } = await import("@/ai/embeddings");
   const lines = bidder.lines.map((l) => ({ ...l, eenheidsprijs: Math.round(l.eenheidsprijs * priceFactor * 100) / 100, totaal: Math.round(l.hoeveelheid * l.eenheidsprijs * priceFactor * 100) / 100 }));
   const price = Math.round(bidder.price * priceFactor);
   const key = BIDDER_KEY(bidder.name);
@@ -737,8 +737,7 @@ async function seedBid(tenderId: string, bidder: DemoBidder, tenderTitle: string
     const [bd] = await db.insert(bidDocuments).values({ organizationId: orgId, createdBy: userId, bidId: bid!.id, fileName: d.name, fileUrl: stored.url, mimeType: "application/pdf", sizeBytes: stored.size, pageCount: 1, extractedText: text, documentKind: d.kind }).returning();
     docIds[d.name] = bd!.id;
     const chunks = chunkText([{ text, page: 1 }]);
-    let vectors: number[][] | null = null;
-    if (embeddingsAvailable()) vectors = await embedTexts(chunks.map((c) => c.content), { orgId, actor: { kind: "system", source: "seed" } });
+    const vectors = await tryEmbedTexts(chunks.map((c) => c.content), { orgId, actor: { kind: "system", source: "seed" } });
     await db.insert(bidChunks).values(chunks.map((c, i) => ({ organizationId: orgId, createdBy: userId, bidId: bid!.id, bidDocumentId: bd!.id, chunkIndex: c.index, page: c.page, content: c.content, embedding: vectors ? vectors[i]! : null })));
   }
   if (withChecks) await log("ai.bid-checker", "bid", bid!.id, 6, { model: "claude-sonnet-4-6", input: 21000, output: 2100, cost: 0.095 });
@@ -746,7 +745,7 @@ async function seedBid(tenderId: string, bidder: DemoBidder, tenderTitle: string
 }
 
 async function seedAssessmentTender(p1: { project: typeof projects.$inferSelect; calcLines: Array<{ activity: string; qty: number; unit: string }> }) {
-  const tenderTitle = `Asbestsanering 40 woningen Meidoornlaan ${DEMO_MARK}`;
+  const tenderTitle = "Asbestsanering 40 woningen Meidoornlaan";
   const closing = daysFromNow(-8);
   const [tender] = await db
     .insert(tenders)
@@ -789,7 +788,7 @@ async function seedAssessmentTender(p1: { project: typeof projects.$inferSelect;
   // Tender documents (all approved) + xlsx price sheet
   const { saveTenderDocument } = await import("@/lib/documents/service");
   const { buildPriceSheetXlsx } = await import("@/lib/documents/xlsx");
-  const tinfo = { title: tenderTitle.replace(` ${DEMO_MARK}`, ""), ref: t.referenceNumber, org: "Woningcorporatie De Nieuwe Stad (fictief)", procedure: "meervoudig onderhandse", criteria: CRITERIA, value: 480_000, sluiting: toIsoDate(closing) };
+  const tinfo = { title: tenderTitle, ref: t.referenceNumber, org: "Woningcorporatie De Nieuwe Stad (fictief)", procedure: "meervoudig onderhandse", criteria: CRITERIA, value: 480_000, sluiting: toIsoDate(closing) };
   const priceLines = p1.calcLines.filter((l) => l.unit !== "post").map((l) => ({ activity: l.activity, qty: l.qty, unit: l.unit }));
   const tdocs: Array<{ kind: (typeof tenderDocuments.$inferInsert)["kind"]; content: C.SeedDocContent; xlsx?: boolean }> = [
     { kind: "aanbestedingsleidraad", content: C.leidraad(tinfo) },
@@ -849,8 +848,8 @@ async function seedAssessmentTender(p1: { project: typeof projects.$inferSelect;
         bidId: s.bid.id,
         criterionId: c.id,
         score: sc.ai[i]!.toFixed(2),
-        rationale: `Beoordeling van ${bidder.name} op ${c.name} volgens de richtlijn: ${c.guideline.split(".")[0]}. De inschrijving beschrijft ${bidder.planSections[i]?.paragraphs[0]?.slice(0, 220) ?? "de aanpak"}. Dit past bij scoreniveau ${sc.ai[i]} omdat de uitwerking ${sc.ai[i]! >= 8 ? "concreet en projectspecifiek is, met aantoonbare beheersing van de risico's en een duidelijke koppeling naar de bronnenlijst en de bewonersplanning" : sc.ai[i]! >= 6 ? "voldoet aan de eisen maar overwegend generiek blijft en weinig projectspecifieke onderbouwing geeft" : "onvolledig is en belangrijke onderdelen zoals buffers, bereikbaarheid en projectspecifieke maatregelen mist"}. Een hoger niveau zou vereisen dat ${sc.ai[i]! >= 8 ? "de inschrijver aantoonbaar meerwaarde boven de eisen levert, bijvoorbeeld met kwantitatieve doelstellingen en een verificatiemethode" : "de aanpak per woningtype wordt uitgewerkt en de ploegbezetting wordt onderbouwd"}; een lager niveau is niet aan de orde omdat de gevraagde onderdelen aanwezig zijn. AI-advies, niet bindend.`,
-        citations: [{ tekst: bidder.planSections[i]?.paragraphs[0]?.slice(0, 120) ?? "", bestand: "plan-van-aanpak.pdf", pagina: 1, bidDocumentId: s.docIds["plan-van-aanpak.pdf"] ?? null }],
+        rationale: `Beoordeling van ${bidder.name} op ${c.name} volgens de richtlijn: ${c.guideline.split(".")[0]}. De inschrijving stelt: "${(bidder.planSections[i + 1] ?? bidder.planSections[i])?.paragraphs[0]?.split(". ")[0] ?? "zie plan van aanpak"}." Dit past bij scoreniveau ${sc.ai[i]} omdat de uitwerking ${sc.ai[i]! >= 8 ? "concreet en projectspecifiek is, met aantoonbare beheersing van de risico's en een duidelijke koppeling naar de bronnenlijst en de bewonersplanning" : sc.ai[i]! >= 6 ? "voldoet aan de eisen maar overwegend generiek blijft en weinig projectspecifieke onderbouwing geeft" : "onvolledig is en belangrijke onderdelen zoals buffers, bereikbaarheid en projectspecifieke maatregelen mist"}. Een hoger niveau zou vereisen dat ${sc.ai[i]! >= 8 ? "de inschrijver aantoonbaar meerwaarde boven de eisen levert, bijvoorbeeld met kwantitatieve doelstellingen en een verificatiemethode" : "de aanpak per woningtype wordt uitgewerkt en de ploegbezetting wordt onderbouwd"}; een lager niveau is niet aan de orde omdat de gevraagde onderdelen aanwezig zijn. AI-advies, niet bindend.`,
+        citations: [{ tekst: (bidder.planSections[i + 1] ?? bidder.planSections[i])?.paragraphs[0]?.split(". ")[0] ?? "", bestand: "plan-van-aanpak.pdf", pagina: 1, bidDocumentId: s.docIds["plan-van-aanpak.pdf"] ?? null }],
         strengths: sc.ai[i]! >= 8 ? ["Projectspecifiek uitgewerkt", "Concrete inzet DTA/DAV"] : ["Voldoet aan de minimumeisen"],
         weaknesses: sc.ai[i]! >= 8 ? [] : ["Generieke beschrijving", "Geen buffers of verificatie beschreven"],
         risks: sc.ai[i]! <= 5 ? ["Risico op vertraging bij onvoorziene omstandigheden"] : [],
@@ -920,7 +919,7 @@ async function seedAssessmentTender(p1: { project: typeof projects.$inferSelect;
 }
 
 async function seedPreparationTender(p2: { project: typeof projects.$inferSelect; calcLines: Array<{ activity: string; qty: number; unit: string }> }) {
-  const title = `Sanering spuitasbest sportcomplex De Kuil ${DEMO_MARK}`;
+  const title = "Sanering spuitasbest sportcomplex De Kuil";
   const [tender] = await db
     .insert(tenders)
     .values({ organizationId: orgId, createdBy: userId, createdAt: daysFromNow(-10), projectId: p2.project.id, title, referenceNumber: "AANB-2026-003", procedure: "nationaal_openbaar", procedureRationale: "Geraamde waarde EUR 1.650.000 ligt boven de beleidsgrens voor meervoudig onderhands maar onder de Europese drempel; nationaal openbaar via TenderNed. Vanwege risicoklasse 2A is gekozen voor BPKV met zwaar accent op VGM.", estimatedValue: "1650000.00", thresholdCheck: { drempel: 5_538_000, bovenDrempel: false, toelichting: "Onder de Europese drempel voor werken; boven de beleidsgrens meervoudig onderhands.", geraamdeWaarde: 1_650_000 }, awardMethod: "bpkv_fictieve_korting", scoreScale: 10, contractForm: "uav_gc", planning: { publicatie: iso(14), nvi: iso(40), sluiting: iso(60), gunning: iso(90) }, status: "voorbereiding", setupApproved: true, setupApprovedBy: userId, setupApprovedAt: daysFromNow(-8), aiSources: KB_SOURCES, aiConfidence: "middel", isDemo: true })
@@ -937,7 +936,7 @@ async function seedPreparationTender(p2: { project: typeof projects.$inferSelect
   await addApproval({ entityType: "award_criteria", entityId: t.id, label: "Gunningscriteria AANB-2026-003 (4 criteria)", projectId: p2.project.id, tenderId: t.id, status: "open", daysAgo: 1, requestedBy: "ai" });
   await db.insert(tenderAssessors).values(ASSESSORS.slice(0, 2).map((a) => ({ organizationId: orgId, createdBy: userId, tenderId: t.id, userId: a.userId, email: a.email, name: a.name, role: a.role, invitedAt: daysFromNow(-3) })));
   const { saveTenderDocument } = await import("@/lib/documents/service");
-  const tinfo = { title: title.replace(` ${DEMO_MARK}`, ""), ref: t.referenceNumber, org: "Gemeente Demostad (fictief)", procedure: "nationaal openbare", criteria: crit2.map((c) => ({ code: c.code, name: c.name, weight: c.weight, guideline: c.guideline })), value: 1_650_000, sluiting: iso(60) };
+  const tinfo = { title: title, ref: t.referenceNumber, org: "Gemeente Demostad (fictief)", procedure: "nationaal openbare", criteria: crit2.map((c) => ({ code: c.code, name: c.name, weight: c.weight, guideline: c.guideline })), value: 1_650_000, sluiting: iso(60) };
   const pveDoc = await saveTenderDocument({ orgId, userId, tenderId: t.id, kind: "programma_van_eisen", title: C.pve(tinfo).title, content: C.pve(tinfo), generatedBy: "ai", model: "claude-sonnet-4-6", aiSources: KB_SOURCES, aiConfidence: "hoog" });
   await db.update(tenderDocuments).set({ status: "geaccordeerd", approvedBy: userId, approvedByName: PL_NAME, approvedAt: daysFromNow(-4), generatedAt: daysFromNow(-5) }).where(eq(tenderDocuments.id, pveDoc.id));
   await addApproval({ entityType: "tender_document", entityId: pveDoc.id, label: "Programma van eisen v1", projectId: p2.project.id, tenderId: t.id, status: "goedgekeurd", daysAgo: 5, requestedBy: "ai" });
@@ -955,7 +954,7 @@ async function seedPreparationTender(p2: { project: typeof projects.$inferSelect
 }
 
 async function seedAwardedTender(p5: { project: typeof projects.$inferSelect }) {
-  const title = `Ketelhuis en installaties gemeentehuis ${DEMO_MARK}`;
+  const title = "Ketelhuis en installaties gemeentehuis";
   const [tender] = await db
     .insert(tenders)
     .values({ organizationId: orgId, createdBy: userId, createdAt: daysFromNow(-460), projectId: p5.project.id, title, referenceNumber: "AANB-2025-004", procedure: "meervoudig_onderhands", procedureRationale: "Raming EUR 95.000; meervoudig onderhands met drie uitnodigingen.", estimatedValue: "95000.00", thresholdCheck: { drempel: 5_538_000, bovenDrempel: false, toelichting: "Onder de drempel.", geraamdeWaarde: 95_000 }, awardMethod: "bpkv_absolute_punten", scoreScale: 10, contractForm: "uav", planning: { publicatie: iso(-455), nvi: iso(-440), sluiting: iso(-430), gunning: iso(-410) }, status: "gegund", tenderNedReference: null, setupApproved: true, setupApprovedBy: userId, setupApprovedAt: daysFromNow(-458), isDemo: true })
@@ -994,7 +993,7 @@ async function seedAwardedTender(p5: { project: typeof projects.$inferSelect }) 
   await addApproval({ entityType: "award_advice", entityId: adv!.id, label: `Gunningsadvies AANB-2025-004 v1: ${winner.bid.bidderName}`, projectId: p5.project.id, tenderId: t.id, status: "goedgekeurd", daysAgo: 411, requestedBy: "ai" });
   await log("ai.award-advisor", "tender", t.id, 412, { model: "claude-sonnet-4-6", input: 24000, output: 9000, cost: 0.21 });
   const { saveTenderDocument } = await import("@/lib/documents/service");
-  const tinfo = { title: title.replace(` ${DEMO_MARK}`, ""), ref: t.referenceNumber, org: "Gemeente Demostad (fictief)" };
+  const tinfo = { title: title, ref: t.referenceNumber, org: "Gemeente Demostad (fictief)" };
   const letters = [
     { kind: "gunningsbrief" as const, bidId: winner.bid.id, content: C.gunningsbrief({ ...tinfo, winner: winner.bid.bidderName, score: ranked[0]!.totalScore, price: ranked[0]!.price }) },
     { kind: "afwijzingsbrief" as const, bidId: loser.bid.id, content: C.afwijzingsbrief({ ...tinfo, winner: winner.bid.bidderName, loser: loser.bid.bidderName, ownScore: ranked[1]!.totalScore, winnerScore: ranked[0]!.totalScore, rows: crit.map((c) => { const w = ranked[0]!.perCriterion.find((p) => p.criterionId === c.id)!; const l = ranked[1]!.perCriterion.find((p) => p.criterionId === c.id)!; return [c.name, String(l.score), String(w.score), c.isPrice ? "Prijsformule laagste/eigen x weging" : l.score >= w.score ? "Gelijkwaardig" : "Winnaar concreter en projectspecifieker uitgewerkt"]; }) }) },

@@ -112,7 +112,7 @@ export default async function AssessmentOverviewPage({ params }: { params: Promi
                                     {appr && can(ctx.role, "approval:decide") ? <div className="mt-2"><ApproveButton approvalId={appr.id} label={appr.entityLabel} summary={[{ label: "Score", value: String(Number(cs!.score)) }, { label: "Motivatie", value: cs!.motivation.slice(0, 200) }]} decide={decideApprovalAction} /></div> : null}
                                   </>
                                 ) : cs ? (
-                                  <span className="font-mono text-xs">{Number(cs.score)} ({cs.status})</span>
+                                  <span className="font-mono text-xs">{Number(cs.score)} ({cs.status === "geaccordeerd" ? "geaccordeerd" : "concept"})</span>
                                 ) : <span className="text-xs text-muted-foreground">-</span>}
                               </td>
                             </tr>

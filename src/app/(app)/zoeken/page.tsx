@@ -10,6 +10,7 @@ import { PROJECT_STATUS_LABELS, TENDER_STATUS_LABELS } from "@/lib/labels";
 import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Zoeken" };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;

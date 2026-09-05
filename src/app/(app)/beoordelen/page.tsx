@@ -8,6 +8,7 @@ import { getContext, visibleTenderIds } from "@/lib/auth";
 import { TENDER_STATUS_LABELS } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Beoordelingen" };
 
 export default async function AssessListPage() {
   const ctx = await getContext();

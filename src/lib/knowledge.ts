@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { db } from "@/db";
 import { knowledgeChunks, knowledgeDocuments } from "@/db/schema";
-import { embeddingsAvailable, embedTexts } from "@/ai/embeddings";
+import { tryEmbedTexts } from "@/ai/embeddings";
 import { chunkText } from "./chunking";
 import type { Actor } from "./guards";
 import { htmlToText, keepSectionsMentioning, parseSeedMarkdown, sliceBetween } from "./html-to-text";
@@ -120,8 +120,7 @@ export async function indexKnowledgeDocument(input: IndexInput): Promise<{ id: s
     id = row!.id;
   }
   try {
-    let vectors: number[][] | null = null;
-    if (embeddingsAvailable() && chunks.length) vectors = await embedTexts(chunks.map((c) => `${input.title}\n${c.heading ?? ""}\n${c.content}`), { orgId: input.organizationId ?? "shared", actor: input.actor });
+    const vectors = await tryEmbedTexts(chunks.map((c) => `${input.title}\n${c.heading ?? ""}\n${c.content}`), { orgId: input.organizationId ?? "shared", actor: input.actor });
     await db.delete(knowledgeChunks).where(eq(knowledgeChunks.documentId, id));
     for (let i = 0; i < chunks.length; i += 200) {
       const batch = chunks.slice(i, i + 200);

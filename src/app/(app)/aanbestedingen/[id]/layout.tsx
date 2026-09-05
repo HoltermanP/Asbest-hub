@@ -14,6 +14,12 @@ import { PROCEDURE_LABELS } from "@/lib/thresholds";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const t = await db.query.tenders.findFirst({ where: eq(tenders.id, id), columns: { title: true, referenceNumber: true } });
+  return { title: t ? `${t.referenceNumber} ${t.title}` : "Aanbesteding" };
+}
+
 export default async function TenderLayout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requirePermission("tender:read");

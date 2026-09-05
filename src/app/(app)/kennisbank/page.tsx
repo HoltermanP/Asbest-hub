@@ -13,6 +13,7 @@ import { sourceIsStale } from "@/lib/knowledge";
 import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Kennisbank" };
 
 const SUGGESTIONS = ["Welke termijn geldt voor de sloopmelding?", "Wat is het verschil tussen risicoklasse 2 en 2A?", "Welke certificaten moet een saneerder hebben?", "Hoe werkt de fictieve korting bij BPKV?"];
 

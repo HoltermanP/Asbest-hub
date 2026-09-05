@@ -19,7 +19,7 @@ import { requirePermission } from "@/lib/auth";
 import { diffDocuments, documentToText } from "@/lib/documents/diff";
 import { formatDateTime } from "@/lib/format";
 import { getJob, jobIsActive } from "@/lib/jobs";
-import { DOCUMENT_STATUS_LABELS, DOCUMENT_TYPE_LABELS } from "@/lib/labels";
+import { DOCUMENT_STATUS_LABELS, DOCUMENT_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/labels";
 import { can } from "@/lib/permissions";
 import { fileDownloadPath } from "@/lib/storage";
 
@@ -116,7 +116,7 @@ export default async function DocumentDetailPage({ params, searchParams }: { par
                 {history.map((h) => (
                   <li key={h.id} className="rounded-md border p-2">
                     <div className="flex items-center justify-between">
-                      <StatusBadge value={h.status} label={h.status} />
+                      <StatusBadge value={h.status} label={APPROVAL_STATUS_LABELS[h.status] ?? h.status} />
                       <span className="text-muted-foreground">{formatDateTime(h.decidedAt ?? h.createdAt)}</span>
                     </div>
                     <p>

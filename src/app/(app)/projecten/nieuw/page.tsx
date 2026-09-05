@@ -4,6 +4,7 @@ import { createProjectAction } from "@/actions/projects";
 import { requirePermission } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Nieuw project" };
 
 export default async function NewProjectPage() {
   await requirePermission("project:write");

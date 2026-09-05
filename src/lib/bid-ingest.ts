@@ -2,7 +2,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { bidChunks, bidDocuments, bids } from "@/db/schema";
-import { embeddingsAvailable, embedTexts } from "@/ai/embeddings";
+import { tryEmbedTexts } from "@/ai/embeddings";
 import { chunkText } from "./chunking";
 import type { Actor } from "./guards";
 import { getFile } from "./storage";
@@ -33,8 +33,7 @@ export async function ingestBidDocument(bidDocumentId: string, ctx: { orgId: str
   await db.update(bidDocuments).set({ extractedText: extracted.text.slice(0, 2_000_000), pageCount: extracted.pageCount, documentKind: kind }).where(eq(bidDocuments.id, doc.id));
   const chunks = chunkText(extracted.pages.map((p) => ({ text: p.text, page: p.page })));
   await db.delete(bidChunks).where(eq(bidChunks.bidDocumentId, doc.id));
-  let vectors: number[][] | null = null;
-  if (embeddingsAvailable() && chunks.length > 0) vectors = await embedTexts(chunks.map((c) => c.content), ctx);
+  const vectors = await tryEmbedTexts(chunks.map((c) => c.content), ctx);
   if (chunks.length > 0) {
     await db.insert(bidChunks).values(
       chunks.map((c, i) => ({

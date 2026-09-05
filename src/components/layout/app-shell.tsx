@@ -14,10 +14,12 @@ export function AppShell({
   children,
   openApprovals,
   roleLabel,
+  orgName,
 }: {
   children: React.ReactNode;
   openApprovals: number;
   roleLabel: string;
+  orgName: string;
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -35,8 +37,9 @@ export function AppShell({
           AsbestHub
         </Link>
         <SidebarNav openApprovals={openApprovals} />
-        <div className="mt-auto border-t border-sidebar-border p-4 font-mono text-[11px] text-sidebar-foreground/60">
-          Rol: {roleLabel}
+        <div className="mt-auto border-t border-sidebar-border p-4 text-xs text-sidebar-foreground/70">
+          <p className="truncate font-medium text-sidebar-foreground/90" title={orgName}>{orgName}</p>
+          <p className="font-mono text-[11px]">Rol: {roleLabel}</p>
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">

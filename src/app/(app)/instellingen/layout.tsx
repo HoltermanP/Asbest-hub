@@ -3,6 +3,7 @@ import { SettingsNav } from "@/components/settings/settings-nav";
 import { requirePermission } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Instellingen" };
 
 export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
   await requirePermission("settings:read");

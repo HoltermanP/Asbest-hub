@@ -94,8 +94,16 @@ export async function searchKnowledge(
   lists.push(textRows.map((r, i) => ({ id: r.id, rank: i + 1 })));
   for (const r of textRows) rowsById.set(r.id, r);
 
+  let queryVec: number[] | null = null;
   if (embeddingsAvailable()) {
-    const vec = toVectorLiteral(await embedQuery(q, { orgId: opts.orgId, actor: opts.actor }));
+    try {
+      queryVec = await embedQuery(q, { orgId: opts.orgId, actor: opts.actor });
+    } catch (err) {
+      console.warn("[rag] embedding van zoekvraag mislukt, alleen full-text:", err instanceof Error ? err.message : err);
+    }
+  }
+  if (queryVec) {
+    const vec = toVectorLiteral(queryVec);
     const vecRows = (await db.execute(sql`
       select c.id, c.document_id, d.title, d.source_url, d.version_date::text as version_date, c.heading, c.content
       from knowledge_chunks c

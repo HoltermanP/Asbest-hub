@@ -11,6 +11,7 @@ import { can } from "@/lib/permissions";
 import { PROJECT_STATUS_LABELS } from "@/lib/labels";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Projecten" };
 
 export default async function ProjectsPage() {
   const ctx = await requirePermission("project:read");

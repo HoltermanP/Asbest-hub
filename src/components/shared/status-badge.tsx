@@ -42,8 +42,9 @@ export function StatusBadge({ value, label, className }: { value: string; label?
   );
 }
 
-export function ConfidenceBadge({ value }: { value: "laag" | "middel" | "hoog" | null | undefined }) {
+export function ConfidenceBadge({ value, showHigh = false }: { value: "laag" | "middel" | "hoog" | null | undefined; showHigh?: boolean }) {
   if (!value) return null;
+  if (value === "hoog" && !showHigh) return null;
   const tone = value === "laag" ? "bg-yellow-100 text-yellow-900 border-yellow-300" : value === "middel" ? "bg-blue-50 text-blue-900 border-blue-200" : "bg-emerald-50 text-emerald-800 border-emerald-200";
   const label = value === "laag" ? "Lage betrouwbaarheid" : value === "middel" ? "Gemiddelde betrouwbaarheid" : "Hoge betrouwbaarheid";
   return (

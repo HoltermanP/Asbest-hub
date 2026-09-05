@@ -124,4 +124,5 @@ export const BID_STATUS_LABELS: Record<string, string> = {
 };
 export const SESSION_STATUS_LABELS: Record<string, string> = { gepland: "Gepland", bezig: "Bezig", verwerkt: "Verwerkt", afgerond: "Afgerond" };
 export const CONFIDENCE_LABELS: Record<string, string> = { laag: "Lage betrouwbaarheid", middel: "Gemiddelde betrouwbaarheid", hoog: "Hoge betrouwbaarheid" };
+export const APPROVAL_STATUS_LABELS: Record<string, string> = { open: "Open", goedgekeurd: "Goedgekeurd", afgewezen: "Afgewezen" };
 export const JOB_STATUS_LABELS: Record<string, string> = { wachtrij: "In wachtrij", bezig: "Bezig", gereed: "Gereed", mislukt: "Mislukt" };

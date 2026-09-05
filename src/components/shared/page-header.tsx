@@ -33,7 +33,7 @@ export function PageHeader({
             ))}
           </nav>
         ) : null}
-        <h1 className="truncate font-heading text-2xl font-semibold">{title}</h1>
+        <h1 className="font-heading text-2xl font-semibold break-words">{title}</h1>
         {description ? <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{description}</p> : null}
         {meta ? <div className="mt-2 flex flex-wrap items-center gap-2">{meta}</div> : null}
       </div>

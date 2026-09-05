@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { approvals, tenders } from "@/db/schema";
 import { investigationValidity } from "../deadlines";
 import { daysBetween } from "../format";
-import { DOCUMENT_TYPE_LABELS, PERMIT_TYPE_LABELS } from "../labels";
+import { DOCUMENT_STATUS_LABELS, DOCUMENT_TYPE_LABELS, PERMIT_TYPE_LABELS } from "../labels";
 import type { ProjectBundle } from "../project-data";
 
 export interface DashboardItem {
@@ -58,7 +58,7 @@ export async function projectDashboard(b: ProjectBundle) {
     items.push({
       severity: "info",
       title: `${DOCUMENT_TYPE_LABELS[type] ?? type} ontbreekt${concept ? " (concept aanwezig)" : ""}`,
-      detail: concept ? `Status: ${concept.status}` : "Nog niet opgesteld",
+      detail: concept ? `Status: ${DOCUMENT_STATUS_LABELS[concept.status] ?? concept.status}` : "Nog niet opgesteld",
       href: `${base}/documenten`,
     });
   }

@@ -14,10 +14,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!state.userId) redirect("/sign-in");
   if (!state.orgId) redirect("/organisatie");
   const ctx = await getContext();
-  await ensureOrganizationSettings(ctx);
+  const settings = await ensureOrganizationSettings(ctx);
   const open = await openApprovalsForUser(ctx);
   return (
-    <AppShell openApprovals={open.length} roleLabel={ROLE_LABELS[ctx.role]}>
+    <AppShell openApprovals={open.length} roleLabel={ROLE_LABELS[ctx.role]} orgName={settings.name}>
       {children}
     </AppShell>
   );

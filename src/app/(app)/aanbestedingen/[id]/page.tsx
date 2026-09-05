@@ -113,7 +113,7 @@ export default async function TenderSetupPage({ params }: { params: Promise<{ id
                   <div>
                     <p className="font-medium">{a.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {a.email} | {a.role} | {a.acceptedAt ? `actief sinds ${formatDateTime(a.acceptedAt)}` : `uitgenodigd ${formatDateTime(a.invitedAt)}`}
+                      {a.email} | {a.role === "voorzitter" ? "Voorzitter" : a.role === "extern" ? "Externe beoordelaar" : "Beoordelaar"} | {a.acceptedAt ? `actief sinds ${formatDateTime(a.acceptedAt)}` : `uitgenodigd ${formatDateTime(a.invitedAt)}`}
                     </p>
                   </div>
                   {writable ? (

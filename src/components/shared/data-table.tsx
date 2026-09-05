@@ -104,7 +104,7 @@ export function DataTable<T>({
                     onClick={href ? () => (window.location.href = href) : undefined}
                   >
                     {columns.map((c) => (
-                      <TableCell key={c.key} className={c.className}>
+                      <TableCell key={c.key} className={cn("whitespace-normal align-top", c.className)}>
                         {c.render(r)}
                       </TableCell>
                     ))}

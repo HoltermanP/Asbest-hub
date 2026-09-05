@@ -13,6 +13,12 @@ import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const p = await db.query.projects.findFirst({ where: eq(projects.id, id), columns: { name: true, projectNumber: true } });
+  return { title: p ? `${p.projectNumber} ${p.name}` : "Project" };
+}
+
 export default async function ProjectLayout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requirePermission("project:read");

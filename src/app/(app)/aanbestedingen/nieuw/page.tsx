@@ -9,6 +9,7 @@ import { getProcurementPolicy } from "@/lib/organization";
 import { formatCurrency } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Nieuwe aanbesteding" };
 
 export default async function NewTenderPage({ searchParams }: { searchParams: Promise<{ project?: string }> }) {
   const { project } = await searchParams;

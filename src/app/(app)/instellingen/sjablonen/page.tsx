@@ -31,7 +31,7 @@ export default async function TemplatesPage() {
                 {t.mergeFields.length ? <p className="mt-1 font-mono text-xs text-muted-foreground">Merge-velden: {t.mergeFields.join(", ")}</p> : null}
               </div>
               <div className="flex items-center gap-2">
-                <StatusBadge value={t.active ? "geaccordeerd" : "verouderd"} label={t.active ? "actief" : "inactief"} />
+                <StatusBadge value={t.active ? "geaccordeerd" : "verouderd"} label={t.active ? "Actief" : "Inactief"} />
                 {t.fileUrl ? <Button size="sm" variant="outline" render={<a href={fileDownloadPath(t.fileUrl, `${t.name}.docx`)}>docx</a>} /> : null}
                 {writable ? (<><TemplateDialog action={saveTemplateAction.bind(null, t.id)} initial={t} trigger={<Button size="sm" variant="ghost">Bewerken</Button>} /><ActionButton action={deleteTemplateAction.bind(null, t.id)} variant="ghost" confirm="Sjabloon verwijderen?" successMessage="Verwijderd">Verwijderen</ActionButton></>) : null}
               </div>
