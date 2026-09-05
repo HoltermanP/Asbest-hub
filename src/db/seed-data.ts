@@ -29,29 +29,27 @@ export const DEMO_BIDDERS: DemoBidder[] = [
       { omschrijving: "Werkplan, LAVS-meldingen en DTA-toezicht", hoeveelheid: 1, eenheidsprijs: 31_940 },
     ],
     planSections: [
-      {
-        heading: "Plan van aanpak",
-        paragraphs: [
-          "Noordwind voert de sanering van 40 woningen uit in vier blokken van tien woningen. Per blok wordt een containment per woning opgebouwd met onderdruk van minimaal 20 Pa, conform het Certificatieschema Asbest. Bewoners worden per blok tijdelijk gehuisvest; de doorlooptijd per woning is drie werkdagen inclusief eindcontrole.",
-          "Wij zetten twee ploegen in met elk een DTA en drie DAV-2 medewerkers. De decontaminatie-unit is een drietraps unit op de begane grond; alle medewerkers gebruiken volgelaatsmaskers met P3-filter en wegwerpoveralls type 5/6.",
-        ],
-      },
-      {
-        heading: "Veiligheid en VGM",
-        paragraphs: [
-          "Ons VGM-plan sluit aan op de VCA**-certificering. Dagelijks vindt een toolboxmeeting plaats, luchtmetingen worden uitgevoerd bij elke vrijgave door een RvA-geaccrediteerd laboratorium (NEN 2990). Afwijkingen worden binnen 24 uur gemeld aan de opdrachtgever en vastgelegd in het logboek.",
-        ],
-      },
-      {
-        heading: "Planning en omgevingsmanagement",
-        paragraphs: [
-          "Start uiterlijk zes weken na gunning, doorlooptijd 14 weken. Bewoners ontvangen twee weken vooraf een bewonersbrief en een persoonlijk bezoek; een vaste omgevingsmanager is dagelijks bereikbaar. Afval wordt afgevoerd via een erkende inzamelaar met stortbewijzen per container.",
-        ],
-      },
-      {
-        heading: "Duurzaamheid en afvalverwerking",
-        paragraphs: ["Transporten worden gebundeld per blok (maximaal twee ritten per week). Verpakkingsmateriaal is gerecycled polyetheen; wij rapporteren de afgevoerde tonnages per woning in LAVS."],
-      },
+      { heading: "1 Inleiding en visie", paragraphs: [
+        "Saneringsbedrijf Noordwind B.V. voert sinds 2004 asbestsaneringen uit in bewoonde corporatiecomplexen. Wij begrijpen dat deze opdracht niet alleen een technische sanering is, maar een ingreep in het dagelijks leven van 40 huishoudens. Onze aanpak is daarom gebouwd op drie pijlers: een voorspelbare blokkenplanning, een strikte veiligheidsroutine per woning en een bewonersbegeleiding die samenwerkt met die van de corporatie.",
+        "Wij hebben de referentiewoningen tijdens de schouw bezocht en de bronnenlijst per woningtype vertaald naar een vaste werkvolgorde. De drie bronnen binnen (vensterbanken, vlakke platen bij de cv, vloerzeil) worden per woning in één containment gesaneerd; de standleiding en het dakleer van blok C worden als aparte buitenwerkzaamheden in risicoklasse 1 uitgevoerd." ] },
+      { heading: "2 Plan van aanpak per woning", paragraphs: [
+        "Per woning hanteren wij een vaste cyclus van drie werkdagen. Dag 1: ontvangst van de sleutel van de bewonersbegeleider, controle op ontruiming, opbouw containment over de woonkamer, slaapkamers, keuken en hal (gemiddeld 60 m2), plaatsing van de onderdrukmachine met HEPA H14 (capaciteit 2.500 m3/uur, ruim zes luchtwisselingen per uur), rookproef en LAVS-controle. Dag 2: verwijderen van de vensterbanken als geheel, demonteren van de vlakke platen bij de cv-ketel zonder breken, bevochtigen en strippen van het vloerzeil, dubbel verpakken en uitsluizen. Dag 3: HEPA-reiniging, eigen visuele controle door de DTA, gereedmelding aan het laboratorium, eindcontrole en na vrijgave afbraak van het containment en oplevering aan de bewonersbegeleider.",
+        "Wij werken in vier blokken van tien woningen met twee ploegen die versprongen werken: terwijl ploeg A op dag 3 de eindcontrole afwacht, bouwt ploeg B in de volgende woning op. Zo leveren wij gemiddeld vier woningen per week op en blijft de laboratoriumcapaciteit gelijkmatig belast.",
+        "De decontaminatie-unit is een mobiele drietraps unit die per portiek op de begane grond wordt geplaatst en via een transitroute met folie aan het containment wordt gekoppeld. Afvalwater wordt gefilterd (5 mu) en geloosd op het riool met toestemming van de gemeente." ] },
+      { heading: "3 Veiligheid en VGM", paragraphs: [
+        "Ons VGM-plan sluit aan op onze VCA**-certificering en wordt per woningtype uitgewerkt in een taakrisicoanalyse (TRA) voor elk van de drie binnenbronnen en de twee buitenbronnen. De onderdruk wordt continu gelogd met een datalogger waarvan de registratie dagelijks bij het dagrapport wordt gevoegd; de streefwaarde is 25 Pa met een alarm bij 20 Pa. Een reserve-onderdrukmachine staat permanent op de bouwplaats.",
+        "Alle medewerkers gebruiken volgelaatsmaskers met P3-filter (fit-test niet ouder dan twaalf maanden) en wegwerpoveralls type 5/6. Dagelijks vindt een toolboxmeeting plaats; wekelijks een veiligheidsronde door onze KAM-coördinator. Afwijkingen worden binnen 24 uur gemeld aan de directievoerder en vastgelegd in het logboek.",
+        "Luchtmetingen worden uitgevoerd bij elke vrijgave door het RvA-geaccrediteerde laboratorium van de opdrachtgever (NEN 2990). Bij woningen die grenzen aan bewoonde woningen laten wij op eigen kosten een referentiemeting in het trappenhuis uitvoeren bij de eerste woning van elk blok." ] },
+      { heading: "4 Planning en ploegbezetting", paragraphs: [
+        "Start uiterlijk zes weken na gunning, na goedkeuring van het werkplan en de LAVS-melding. Doorlooptijd 14 weken: vier blokken van drie weken plus een buffer van twee weken aan het einde. Per ploeg zetten wij één DTA en drie DAV-2-medewerkers in; de projectleider is drie dagen per week op locatie en de KAM-coördinator wekelijks.",
+        "De blokkenplanning wordt vier weken vooraf met de bewonersbegeleider vastgesteld; woningen die niet tijdig zijn ontruimd schuiven naar het einde van het blok zonder gevolgen voor de overige woningen." ] },
+      { heading: "5 Omgevingsmanagement en bewonerscommunicatie", paragraphs: [
+        "Bewoners ontvangen twee weken vooraf een bewonersbrief met de exacte data en een persoonlijk bezoek van onze omgevingsmanager samen met de bewonersbegeleider van de corporatie. Onze omgevingsmanager is dagelijks van 07:30 tot 17:00 op locatie bereikbaar en buiten die tijden via het storingsnummer.",
+        "Wij plaatsen een informatiebord bij elk portiek met de planning van de week, houden een wekelijks inloopspreekuur en registreren klachten in ons klachtensysteem met terugkoppeling binnen één werkdag. Bij de oplevering van elke woning ontvangt de bewoner een vrijgavebrief met het certificaatnummer." ] },
+      { heading: "6 Duurzaamheid en afvalverwerking", paragraphs: [
+        "Transporten worden gebundeld per blok (maximaal twee ritten per week) met een vaste VIHB-geregistreerde inzamelaar. Verpakkingsmateriaal is gerecycled polyetheen; folie van containments wordt als asbesthoudend afval afgevoerd. Wij rapporteren de afgevoerde tonnages per woning in het LAVS en in het wekelijkse voortgangsrapport, inclusief begeleidingsbrieven en stortbewijzen." ] },
+      { heading: "7 Projectteam en certificering", paragraphs: [
+        "Projectleider: 12 jaar ervaring in corporatiebezit, laatste referentie 64 woningen in bewoonde staat. DTA's: twee vaste DTA's met elk meer dan 8 jaar ervaring. Alle medewerkers beschikken over geldige DAV-2-certificaten en een recente medische keuring. Ons procescertificaat asbestverwijdering 07-D070000001 is geldig tot 30-06-2028; VCA** tot 15-11-2027." ] },
     ],
     certificates: [
       { naam: "Ascert procescertificaat asbestverwijdering", nummer: "07-D070000001", geldigTot: "2028-06-30" },
@@ -74,25 +72,21 @@ export const DEMO_BIDDERS: DemoBidder[] = [
       { omschrijving: "Werkplan, LAVS-meldingen en DTA-toezicht", hoeveelheid: 1, eenheidsprijs: 29_100 },
     ],
     planSections: [
-      {
-        heading: "Plan van aanpak",
-        paragraphs: [
-          "Wij saneren de 40 woningen in een lineaire stroom van twee woningen per dag. Elke woning wordt als één containment uitgevoerd. De opdrachtgever levert de woningen leeg op; wij hanteren een vaste ploeg van vier personen inclusief DTA.",
-          "Voorafgaand aan de start dienen wij per woning de LAVS-melding in en ontvangt de opdrachtgever een gecombineerd werkplan.",
-        ],
-      },
-      {
-        heading: "Veiligheid en VGM",
-        paragraphs: ["Alle werkzaamheden vinden plaats conform Arbobesluit hoofdstuk 4 afdeling 5. Persoonlijke beschermingsmiddelen zijn beschikbaar op locatie. Eindcontrole door een geaccrediteerd laboratorium na afronding van elke woning."],
-      },
-      {
-        heading: "Planning en omgevingsmanagement",
-        paragraphs: ["Doorlooptijd 10 weken na start. Bewoners worden per brief geïnformeerd door de opdrachtgever; wij leveren de tekst aan. Klachten kunnen via ons kantoornummer tijdens kantooruren worden gemeld."],
-      },
-      {
-        heading: "Duurzaamheid en afvalverwerking",
-        paragraphs: ["Afval wordt gestort bij een erkende stortplaats. Stortbewijzen worden na afloop van het project gebundeld verstrekt."],
-      },
+      { heading: "1 Inleiding", paragraphs: [
+        "Asbestspecialisten Van der Berg B.V. is een gecertificeerd asbestverwijderingsbedrijf met ruime ervaring in woningsaneringen. Wij bieden een efficiënte en scherp geprijsde aanpak waarbij wij twee woningen per dag saneren." ] },
+      { heading: "2 Plan van aanpak", paragraphs: [
+        "Wij saneren de 40 woningen in een lineaire stroom. Elke woning wordt als één containment uitgevoerd; de opdrachtgever levert de woningen leeg op. Wij werken met één vaste ploeg van vier personen inclusief DTA. De bronnen worden in de volgorde vensterbanken, platen, vloerzeil verwijderd volgens de gebruikelijke methoden uit het certificatieschema.",
+        "Voorafgaand aan de start dienen wij per woning de LAVS-melding in en ontvangt de opdrachtgever een gecombineerd werkplan voor het hele complex. Het dakleer en de standleidingen voeren wij uit als risicoklasse 1 na afronding van de binnenwerkzaamheden." ] },
+      { heading: "3 Veiligheid en VGM", paragraphs: [
+        "Alle werkzaamheden vinden plaats conform Arbobesluit hoofdstuk 4 afdeling 5 en ons standaard VGM-plan dat bij deze inschrijving is gevoegd. Persoonlijke beschermingsmiddelen zijn beschikbaar op locatie. De onderdruk wordt bij aanvang van elke dag gemeten en genoteerd. Eindcontrole door een geaccrediteerd laboratorium na afronding van elke woning." ] },
+      { heading: "4 Planning", paragraphs: [
+        "Doorlooptijd 10 weken na start. Wij hanteren een strakke planning zonder buffer; bij uitloop zetten wij een tweede ploeg in vanuit een ander project." ] },
+      { heading: "5 Omgeving en bewoners", paragraphs: [
+        "Bewoners worden per brief geïnformeerd door de opdrachtgever; wij leveren de tekst aan. Klachten kunnen via ons kantoornummer tijdens kantooruren worden gemeld en worden binnen drie werkdagen beantwoord." ] },
+      { heading: "6 Afvalverwerking", paragraphs: [
+        "Afval wordt gestort bij een erkende stortplaats. Stortbewijzen worden na afloop van het project gebundeld verstrekt." ] },
+      { heading: "7 Team en certificaten", paragraphs: [
+        "Eén DTA en drie DAV-2-medewerkers. Procescertificaat 07-D070000002 geldig tot 31-03-2027; VCA* tot 01-10-2026 (verlenging aangevraagd)." ] },
     ],
     certificates: [
       { naam: "Ascert procescertificaat asbestverwijdering", nummer: "07-D070000002", geldigTot: "2027-03-31" },
@@ -115,31 +109,27 @@ export const DEMO_BIDDERS: DemoBidder[] = [
       { omschrijving: "Werkplan, LAVS-meldingen en DTA-toezicht", hoeveelheid: 1, eenheidsprijs: 36_280 },
     ],
     planSections: [
-      {
-        heading: "Plan van aanpak",
-        paragraphs: [
-          "Ons plan is gebaseerd op een uitgebreide risicoanalyse per woning op basis van het inventarisatierapport. Per woningtype (drie typen in het complex) is een standaard containmentconfiguratie uitgewerkt met tekeningen. Wij werken met drie ploegen zodat per week vier woningen worden opgeleverd, inclusief vrijgave en herstelwerk van kozijnen.",
-          "Een projectleider met tien jaar ervaring in corporatiebezit stuurt het werk aan; wekelijks bouwvergaderen wij met de opdrachtgever en rapporteren voortgang, afwijkingen en LAVS-status.",
-        ],
-      },
-      {
-        heading: "Veiligheid en VGM",
-        paragraphs: [
-          "Het VGM-plan bevat een taakrisicoanalyse per bron, een noodplan met evacuatieroutes per woningtype en een meetplan voor onderdruk (continue registratie) en luchtkwaliteit buiten het containment. Alle medewerkers zijn DAV-2 gecertificeerd; twee DTA's zijn permanent aanwezig.",
-        ],
-      },
-      {
-        heading: "Planning en omgevingsmanagement",
-        paragraphs: [
-          "Doorlooptijd 12 weken met een buffer van twee weken. Wij organiseren een bewonersavond, een spreekuur per blok en een 24/7 bereikbaar storingsnummer. Bewoners met een zorgvraag worden apart benaderd in overleg met de corporatie.",
-        ],
-      },
-      {
-        heading: "Duurzaamheid en afvalverwerking",
-        paragraphs: [
-          "Wij zetten elektrische bestelbussen in voor personeel en bundelen afvaltransport (Euro 6). Per woning leggen wij de afgevoerde hoeveelheid en het stortbewijs vast in LAVS en in een dashboard voor de opdrachtgever.",
-        ],
-      },
+      { heading: "1 Inleiding en analyse van de opgave", paragraphs: [
+        "Milieu & Sanering Zuid-Holland B.V. heeft het inventarisatierapport, de werkomschrijving en de schouw vertaald naar een risicoanalyse per woningtype. Het complex kent drie woningtypen (hoekwoning, tussenwoning, bovenwoning blok C) met verschillende containmentafmetingen en routes naar de decontaminatie-unit. Voor elk type hebben wij een standaard containmentconfiguratie met tekening uitgewerkt (bijlage), inclusief positie van onderdrukmachine, sluizen en meetpunten.",
+        "Onze visie: kwaliteit ontstaat door herhaalbaarheid. Door per woningtype exact dezelfde opbouw, werkvolgorde en controle te hanteren, verkleinen wij de kans op afkeur en uitloop en kunnen bewoners precies weten wat hen te wachten staat." ] },
+      { heading: "2 Plan van aanpak per woningtype", paragraphs: [
+        "Type A (hoekwoning, 68 m2): containment over de volledige begane grond en verdieping in twee compartimenten met een gezamenlijke onderdrukmachine van 3.000 m3/uur; de vensterbanken (6 stuks) worden als geheel losgesneden, de vlakke platen bij de cv-ketel gedemonteerd na bevochtiging, het vloerzeil in banen bevochtigd, opgerold en direct verpakt. Type B (tussenwoning, 58 m2): één compartiment, zelfde volgorde. Type C (bovenwoning blok C): containment met transitroute via het trappenhuis en extra aandacht voor het dakbeschot dat in samenhang met het dakleer (buitenwerk) wordt behandeld.",
+        "Wij zetten drie ploegen in (elk één DTA en drie DAV-2) zodat per week vier woningen worden opgeleverd inclusief vrijgave en herstel van de aansluitingen van kozijnen en cv. De standleidingen in de kruipruimte en het dakleer van blok C worden door een vierde, gespecialiseerde buitenploeg in risicoklasse 1 uitgevoerd, parallel aan het binnenwerk maar nooit gelijktijdig in dezelfde woning.",
+        "Kwaliteitsborging: per woning een checklist met 32 controlepunten (opbouw, rookproef, onderdruk, PBM, verwijdering, reiniging, gereedmelding), digitaal ondertekend door de DTA en dagelijks gedeeld met de directievoerder. Bij een afwijking wordt de woning niet gereedgemeld voordat de afwijking is opgelost." ] },
+      { heading: "3 Veiligheid en VGM", paragraphs: [
+        "Ons projectspecifieke VGM-plan bevat een taakrisicoanalyse per bron (vijf TRA's), een noodplan per woningtype met evacuatieroutes en verzamelplaats, en een meetplan: continue onderdrukregistratie met alarm (streef 25 Pa, alarm 20 Pa), rookproef met fotoregistratie, en luchtmetingen buiten het containment bij de eerste woning van elk blok en bij elke woning die grenst aan een bewoonde woning. Twee DTA's zijn permanent aanwezig; onze KAM-manager voert wekelijks een onaangekondigde inspectie uit.",
+        "Alle medewerkers zijn DAV-2 gecertificeerd, hebben een fit-test van minder dan een jaar oud en een geldige medische keuring. Wij gebruiken aangedreven ademhalingsbescherming (TM3) bij het strippen van vloerzeil vanwege de hogere vezelemissie bij niet-hechtgebonden materiaal.",
+        "Incidenten en bijna-ongevallen worden dezelfde dag gemeld en binnen 48 uur geanalyseerd; de resultaten worden in de toolbox gedeeld. In onze laatste drie corporatieprojecten (in totaal 214 woningen) zijn geen afkeuringen bij eindcontroles en geen registratieplichtige incidenten voorgekomen." ] },
+      { heading: "4 Planning en doorlooptijd", paragraphs: [
+        "Doorlooptijd 12 weken met een buffer van twee weken, opgebouwd uit vier blokken van tien woningen. De bewonersplanning is leidend: wij stemmen de volgorde vier weken vooraf af met de bewonersbegeleider en reserveren per blok twee reservedagen. Buitenwerk (dak blok C) is gepland in de weken met de laagste regenkans en heeft een eigen buffer van vijf werkdagen.",
+        "Wekelijks bouwvergaderen wij met de opdrachtgever en rapporteren voortgang, afwijkingen, klachten en LAVS-status in een dashboard dat de opdrachtgever online kan inzien." ] },
+      { heading: "5 Omgevingsmanagement en bewonerscommunicatie", paragraphs: [
+        "Wij organiseren samen met de corporatie een bewonersavond, houden per blok een inloopspreekuur en hebben een 24/7 bereikbaar storingsnummer met een reactie binnen 30 minuten bij veiligheidsklachten. Onze omgevingsmanager is fulltime op locatie en bezoekt elke bewoner persoonlijk vóór de sanering en na de vrijgave. Bewoners met een zorgvraag worden in overleg met de corporatie apart benaderd; wij hebben ervaring met verhuishulp voor minder mobiele bewoners.",
+        "Communicatiemiddelen: bewonersbrief per blok, informatiebord per portiek, wekelijkse nieuwsbrief, meertalige samenvatting (Nederlands, Engels, Turks, Arabisch) en een vrijgavebrief per woning met certificaatnummer." ] },
+      { heading: "6 Duurzaamheid en afvalverwerking", paragraphs: [
+        "Personeel reist met elektrische bestelbussen; afvaltransport is gebundeld (Euro 6, maximaal één rit per blok per week). Verpakkingsmateriaal is gerecycled PE. Per woning leggen wij de afgevoerde hoeveelheid, de begeleidingsbrief en het stortbewijs vast in het LAVS en in het dashboard van de opdrachtgever; na afloop ontvangt de opdrachtgever een afvalbalans per bron." ] },
+      { heading: "7 Projectteam en certificering", paragraphs: [
+        "Projectleider met tien jaar ervaring in corporatiebezit (referenties: 120 woningen bewoonde staat 2024, 94 woningen 2023). Twee vaste DTA's en een KAM-manager. Procescertificaat asbestverwijdering 07-D070000003 geldig tot 31-01-2029; VCA** tot 20-05-2028; aansprakelijkheidsverzekering EUR 5.000.000 per aanspraak." ] },
     ],
     certificates: [
       { naam: "Ascert procescertificaat asbestverwijdering", nummer: "07-D070000003", geldigTot: "2029-01-31" },
