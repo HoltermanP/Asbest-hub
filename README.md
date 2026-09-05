@@ -24,13 +24,12 @@ flowchart LR
   end
   subgraph Vercel
     SA[Server Actions + Route Handlers<br/>autorisatie in code]
-    JOB[/api/jobs/run<br/>QStash callback]
+    JOB[after()-taken + /api/cron/jobs<br/>vangnet voor AI-taken]
     CRON[/api/cron/reminders]
   end
   subgraph Data
     PG[(Neon Postgres<br/>Drizzle, pgvector, pg_trgm)]
     BLOB[(Vercel Blob<br/>uploads, docx, pdf, xlsx)]
-    REDIS[(Upstash Redis<br/>rate limiting)]
   end
   subgraph AI
     AG[Agents src/ai/agents<br/>zod-schema's, tool use]
@@ -39,16 +38,15 @@ flowchart LR
     OA[OpenAI<br/>text-embedding-3-large, Whisper]
   end
   CLERK[Clerk<br/>auth, organisaties, rollen]
-  QS[Upstash QStash<br/>wachtrij lange AI-taken]
   RS[Resend<br/>e-mail]
 
   UI --> SA
   UI -. polling ai_jobs .-> SA
   SA --> PG
   SA --> BLOB
-  SA --> REDIS
   SA --> CLERK
-  SA -- enqueue --> QS --> JOB --> AG
+  SA -- ai_jobs + after() --> AG
+  JOB --> AG
   AG --> RAG --> PG
   AG --> CL
   AG --> OA
@@ -73,7 +71,7 @@ Belangrijke mappen:
 1. **Vereisten**: Node 20+, pnpm 9 (`corepack enable`), Postgres 14+ met de extensies `vector` (pgvector >= 0.7) en `pg_trgm`. Lokaal: `brew install postgresql@16 pgvector` of Docker: `docker run -e POSTGRES_PASSWORD=postgres -p 5432:5432 pgvector/pgvector:pg16`.
 2. **Clone en installeer**: `git clone <repo> && cd asbesthub && pnpm install`.
 3. **Clerk**: maak op https://dashboard.clerk.com een applicatie (development instance). Zet onder *Organizations* de organisaties aan en maak de rollen `org:admin`, `org:projectleider`, `org:beoordelaar`, `org:lezer`, `org:extern` (zie *Clerk-configuratie*). Kopieer de publishable key en secret key.
-4. **Env**: `cp .env.example .env` en vul minimaal `DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `ANTHROPIC_API_KEY` en `OPENAI_API_KEY` in. Elke variabele is in `.env.example` toegelicht. Zonder Blob/QStash/Upstash/Resend draait de app lokaal met fallbacks (lokale bestandsopslag, in-process taken, geen rate limiting, e-mails worden gelogd).
+4. **Env**: `cp .env.example .env` en vul minimaal `DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `ANTHROPIC_API_KEY` en `OPENAI_API_KEY` in. Elke variabele is in `.env.example` toegelicht. Zonder Blob/Resend draait de app lokaal met fallbacks (lokale bestandsopslag, e-mails worden gelogd). AI-taken draaien altijd in-process na de response; rate limiting telt op de database.
 5. **Database**: `pnpm db:migrate` (maakt extensies, tabellen en indexen).
 6. **Demo-data**: maak in Clerk een organisatie aan, log één keer in en kopieer het organisatie-id (`org_...`) uit het Clerk-dashboard. Draai `SEED_ORG_ID=org_xxx SEED_USER_ID=user_xxx pnpm db:seed`. Dit maakt één demo-organisatie, twee projecten, één aanbesteding met drie fictieve inschrijvingen (gegenereerde pdf's) en het prijzenboek. Alle demo-data is gemarkeerd als `[DEMO - fictieve gegevens]`.
 7. **Kennisbank**: `pnpm knowledge:import` haalt de publieke bronnen op (wetten.overheid.nl, IPLO, Ascert, Arbeidsinspectie, PIANOo) en laadt de gecureerde teksten uit `data/knowledge`. Met `--skip-web` alleen de gecureerde teksten; met `--only=key1,key2` een selectie. Zonder `OPENAI_API_KEY` werkt alleen full-text zoeken.
@@ -92,11 +90,10 @@ Zie `.env.example`. Samenvatting:
 | `ANTHROPIC_API_KEY` | ja (AI) | Claude voor alle agents |
 | `OPENAI_API_KEY` | ja (AI) | Embeddings (`text-embedding-3-large`) en Whisper |
 | `AI_MODEL_REASONING`, `AI_MODEL_FAST` | nee | Modeloverride (standaard `claude-sonnet-4-6`, `claude-haiku-4-5`) |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | productie | Rate limiting (30 AI-aanroepen/min/organisatie) |
-| `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` | productie | Wachtrij voor lange AI-taken |
+| `JOBS_SECRET` | nee | Beveiligt `/api/jobs/run` voor handmatige herstarts (valt terug op `CRON_SECRET`) |
 | `BLOB_READ_WRITE_TOKEN` | productie | Vercel Blob; lokaal fallback naar `LOCAL_STORAGE_DIR` |
 | `RESEND_API_KEY`, `EMAIL_FROM` | productie | E-mail (uitnodigingen, accorderingsverzoeken, herinneringen) |
-| `APP_URL` | ja | Publieke URL (links in e-mail, QStash callback) |
+| `APP_URL` | ja | Publieke URL (links in e-mail) |
 | `CRON_SECRET` | productie | Beveiliging van `/api/cron/reminders` |
 
 ## Deploy naar Vercel
@@ -104,9 +101,9 @@ Zie `.env.example`. Samenvatting:
 1. Maak een Vercel-project op de repository. Branchmodel: `develop` -> preview deployments, `main` -> productie. Stel in Vercel *Git > Production Branch* in op `main`.
 2. Voeg alle env-variabelen toe (Production en Preview afzonderlijk; gebruik voor Preview een Clerk development instance en een Neon branch).
 3. Neon: maak een project, kopieer de **pooled** connection string naar `DATABASE_URL`. Migraties draaien niet automatisch; voer `pnpm db:migrate` uit vanaf een machine met toegang (of voeg een GitHub Actions deploy-stap toe die `pnpm db:migrate` met de productie-URL draait). Nieuwe migraties: `pnpm db:generate` na schemawijzigingen, controleer de SQL, commit `drizzle/`.
-4. Upstash: maak een Redis-database en een QStash-omgeving; de callback-URL is `${APP_URL}/api/jobs/run`.
+4. AI-taken: geen externe wachtrij nodig. Server actions starten de taak na de response (`after()`), de route-segmenten hebben `maxDuration = 300` (Vercel Pro; op Hobby geldt 60 s en kunnen lange documentgeneraties door de cron `/api/cron/jobs` worden afgemaakt). Rate limiting: 30 AI-taken per minuut per organisatie, geteld op `ai_jobs`.
 5. Vercel Blob: maak een store en koppel het token. Resend: verifieer het verzenddomein.
-6. `vercel.json` bevat de dagelijkse cron (`/api/cron/reminders`, 06:00 UTC) en een verhoogde `maxDuration` voor de job-route. Stel `CRON_SECRET` in; Vercel stuurt dit als Bearer-token.
+6. `vercel.json` bevat de crons `/api/cron/reminders` (dagelijks 06:00 UTC) en `/api/cron/jobs` (elke 10 minuten, herstart vastgelopen AI-taken) en de `maxDuration` van 300 s. Stel `CRON_SECRET` in; Vercel stuurt dit als Bearer-token.
 7. Clerk: zet in productie de production instance met eigen domein; voeg `APP_URL` toe aan de toegestane origins.
 
 ### Branch protection

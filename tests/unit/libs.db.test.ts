@@ -152,7 +152,7 @@ describe.runIf(hasDb)("libraries against the database", () => {
     expect(fresh.name).toBe("Organisatie");
   });
 
-  it("enqueues and runs a job inline without QStash", async () => {
+  it("enqueues and runs a job in-process", async () => {
     const { enqueueJob, getJob, jobIsActive } = await import("@/lib/jobs");
     const job = await enqueueJob({ ctx, agent: "knowledge-answerer", input: { question: "Wat is de termijn?", requestedByName: "L" }, entityType: "knowledge" });
     await new Promise((r) => setTimeout(r, 300));
@@ -165,6 +165,17 @@ describe.runIf(hasDb)("libraries against the database", () => {
     const unknown = await enqueueJob({ ctx, agent: "bestaat-niet", input: {} });
     await new Promise((r) => setTimeout(r, 300));
     expect((await getJob(orgId, unknown.id))?.status).toBe("mislukt");
+  });
+
+  it("rate-limits AI jobs per organization on the ai_jobs table", async () => {
+    const { db } = await import("@/db");
+    const { aiJobs } = await import("@/db/schema");
+    const { checkAiRateLimit, RateLimitError } = await import("@/lib/ratelimit");
+    const rlOrg = `org_rl_${Date.now()}`;
+    await expect(checkAiRateLimit(rlOrg, 2)).resolves.toBeUndefined();
+    await db.insert(aiJobs).values([1, 2].map(() => ({ organizationId: rlOrg, createdBy: "t", agent: "x", input: {} })));
+    await expect(checkAiRateLimit(rlOrg, 2)).rejects.toThrow(RateLimitError);
+    await db.delete(aiJobs).where(eq(aiJobs.organizationId, rlOrg));
   });
 
   it("formats values, validates env and wraps action results", async () => {

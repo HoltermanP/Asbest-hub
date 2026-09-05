@@ -23,8 +23,8 @@ Kosten per aanroep worden berekend uit een prijstabel en gelogd in `audit_log` (
 ## Uitvoering
 
 - `src/ai/client.ts` - `generateStructured()`: één aanroep = systeemprompt + context + gebruikersbericht -> geforceerde tool call -> zod-validatie -> audit.
-- `src/lib/jobs.ts` + `src/ai/runner.ts` - achtergrondtaken (`ai_jobs`) met voortgang; in productie via Upstash QStash (`/api/jobs/run`, signature-check), lokaal in-process na de response. De UI pollt `/api/jobs/[id]`.
-- Rate limiting: 30 AI-aanroepen per minuut per organisatie (Upstash Redis).
+- `src/lib/jobs.ts` + `src/ai/runner.ts` - achtergrondtaken (`ai_jobs`) met voortgang; ze draaien in-process na de response (`after()`, route-segmenten met `maxDuration = 300`). De cron `/api/cron/jobs` herstart taken die in de wachtrij blijven of crashen (maximaal drie pogingen); `/api/jobs/run` (bearer `JOBS_SECRET`) start een taak handmatig. De UI pollt `/api/jobs/[id]`.
+- Rate limiting: 30 AI-taken per minuut per organisatie, geteld op `ai_jobs` (geen externe dienst).
 - Kennisbankvragen draaien synchroon door de job-runner (korte taak) voor dezelfde audittrail.
 
 ## Agents (`src/ai/agents`)

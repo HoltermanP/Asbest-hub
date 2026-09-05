@@ -1,27 +1,7 @@
 import "server-only";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import { isProduction } from "./env";
-
-let limiter: Ratelimit | null | undefined;
-
-function getLimiter(): Ratelimit | null {
-  if (limiter !== undefined) return limiter;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) {
-    if (isProduction()) throw new Error("Upstash Redis is niet geconfigureerd (UPSTASH_REDIS_REST_URL/TOKEN)");
-    limiter = null;
-    return limiter;
-  }
-  limiter = new Ratelimit({
-    redis: new Redis({ url, token }),
-    limiter: Ratelimit.slidingWindow(30, "1 m"),
-    prefix: "asbesthub:ai",
-    analytics: false,
-  });
-  return limiter;
-}
+import { and, count, eq, gte } from "drizzle-orm";
+import { db } from "@/db";
+import { aiJobs } from "@/db/schema";
 
 export class RateLimitError extends Error {
   readonly status = 429;
@@ -31,10 +11,14 @@ export class RateLimitError extends Error {
   }
 }
 
-/** Sliding window of 30 AI calls per minute per organization. */
-export async function checkAiRateLimit(orgId: string): Promise<void> {
-  const l = getLimiter();
-  if (!l) return;
-  const res = await l.limit(orgId);
-  if (!res.success) throw new RateLimitError(res.reset);
+export const AI_RATE_LIMIT_PER_MINUTE = 30;
+
+/**
+ * Sliding window of AI tasks per organization per minute, counted on the
+ * ai_jobs table (every AI call goes through a job). No external service needed.
+ */
+export async function checkAiRateLimit(orgId: string, limit = AI_RATE_LIMIT_PER_MINUTE): Promise<void> {
+  const since = new Date(Date.now() - 60_000);
+  const [row] = await db.select({ n: count() }).from(aiJobs).where(and(eq(aiJobs.organizationId, orgId), gte(aiJobs.createdAt, since)));
+  if ((row?.n ?? 0) >= limit) throw new RateLimitError(since.getTime() + 60_000);
 }

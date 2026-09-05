@@ -42,7 +42,7 @@ function fakeOutput(agent: string, userMessage: string): unknown {
     case "investigation-extractor":
       return { samenvatting: "Rapport type A.", bronnen: [{ locatie: "Cv-ruimte", materiaal: "Asbestcement plaat", hechtgebondenheid: "hechtgebonden", hoeveelheid: 12, eenheid: "m2", risicoklasse: "2", saneringsmethode: "Containment", pagina: 1 }], aanbevelingen: ["Type B onderzoek"], gebruikteKennisbankLabels: ["K1"], confidence: "hoog" };
     case "permit-advisor":
-      return { meldingen: [{ type: "sloopmelding", naam: "Sloopmelding", vereist: true, bevoegdGezag: "Gemeente", onderbouwing: "Bbl 7.10", termijnDagen: 28, termijnInWerkdagen: false, conceptTekst: "Hierbij melden wij...", gebruikteKennisbankLabels: ["K1"], confidence: "hoog" }, { type: "overige", naam: "Nutsbedrijven", vereist: true, bevoegdGezag: "Netbeheerder", onderbouwing: "Gas afsluiten", termijnDagen: 14, termijnInWerkdagen: false, conceptTekst: null, gebruikteKennisbankLabels: [], confidence: "middel" }], algemeneOpmerkingen: [], confidence: "hoog" };
+      return { meldingen: [{ type: "sloopmelding", naam: "Sloopmelding", vereist: true, bevoegdGezag: "Gemeente", onderbouwing: "Bbl 7.10", termijnDagen: 28, termijnInWerkdagen: false, conceptTekst: "Hierbij melden wij...", gebruikteKennisbankLabels: ["K1"], confidence: "hoog" }, { type: "omgevingsvergunning", naam: "Omgevingsvergunning monument", vereist: true, bevoegdGezag: "Gemeente", onderbouwing: "Beschermd stadsgezicht", termijnDagen: 56, termijnInWerkdagen: false, conceptTekst: null, gebruikteKennisbankLabels: [], confidence: "middel" }], algemeneOpmerkingen: [], confidence: "hoog" };
     case "document-author":
     case "tender-author":
       return doc(/DOCUMENTTYPE: (\w+)/.exec(userMessage)?.[1] ?? "Document");
@@ -129,7 +129,7 @@ describe.runIf(hasDb)("agents against seeded database", () => {
     const out = await permitAdvisor.run({ projectId, requestedByName: "Tester" }, runCtx("job-permit"));
     const rows = await db.query.permits.findMany({ where: eq(permits.projectId, projectId) });
     expect(rows.filter((r) => r.type === "sloopmelding")).toHaveLength(1); // seeded one kept, proposal skipped
-    expect(rows.find((r) => r.type === "overige")?.status).toBe("voorgesteld");
+    expect(rows.find((r) => r.type === "omgevingsvergunning")?.status).toBe("voorgesteld");
     expect(out.aantalVereist).toBe(1);
   });
 

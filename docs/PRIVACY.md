@@ -24,7 +24,7 @@ AsbestHub verwerkt persoonsgegevens alleen voor zover nodig voor het beheren van
 - **Recht op verwijdering / einde overeenkomst**: admin-actie *Instellingen > Organisatie > Alle organisatiegegevens verwijderen* verwijdert alle databaserijen van de organisatie. Bestanden in Vercel Blob staan onder het prefix `orgs/<organisatie-id>/` en kunnen met één prefix-delete worden verwijderd (`vercel blob rm` of via het dashboard). Clerk-accounts worden door de beheerder in Clerk verwijderd.
 - **Inzage en correctie**: gebruikers zien hun eigen gegevens in Clerk; projectgegevens zijn door projectleiders te corrigeren.
 - **Beveiliging**: HTTPS (Vercel), sessies via Clerk, geen geheimen in de client, uploadlimiet 50 MB met virusscan-hook (interface aanwezig; koppel een scanner voordat u onbekende inschrijvers laat uploaden), rate limiting op AI-endpoints.
-- **Subverwerkers**: Vercel (hosting, Blob), Neon (database), Clerk (identiteit), Upstash (Redis/QStash), Anthropic (LLM), OpenAI (embeddings, transcriptie), Resend (e-mail). Sluit met elk een verwerkersovereenkomst en kies waar mogelijk EU-regio's (Neon: eu-central-1, Upstash: eu-west-1, Vercel: fra1).
+- **Subverwerkers**: Vercel (hosting, Blob), Neon (database), Clerk (identiteit), Anthropic (LLM), OpenAI (embeddings, transcriptie), Resend (e-mail). Sluit met elk een verwerkersovereenkomst en kies waar mogelijk EU-regio's (Neon: eu-central-1, Vercel: fra1).
 - **Geen geautomatiseerde besluitvorming**: AI-output is altijd een voorstel; uitsluiting, scores, gunning en publicatie vereisen een menselijke accordering met naam en tijdstip (Aanbestedingswet en AVG art. 22).
 
 ## Datalekprocedure (aanbeveling voor de organisatie)
