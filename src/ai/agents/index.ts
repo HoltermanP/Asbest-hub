@@ -1,12 +1,15 @@
 import "server-only";
+import { calculatorAgent } from "./calculator";
+import { documentAuthor } from "./document-author";
+import { investigationExtractor } from "./investigation-extractor";
+import { permitAdvisor } from "./permit-advisor";
+import { plannerAgent } from "./planner";
 import type { AgentDefinition } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyAgent = AgentDefinition<any, any>;
 
-/** Registry of all agents, keyed by agent name. Populated by each agent module. */
-export const AGENTS: Record<string, AnyAgent> = {};
+const list: AnyAgent[] = [investigationExtractor, permitAdvisor, documentAuthor, calculatorAgent, plannerAgent];
 
-export function registerAgent(agent: AnyAgent): void {
-  AGENTS[agent.name] = agent;
-}
+/** Registry of all agents, keyed by agent name. */
+export const AGENTS: Record<string, AnyAgent> = Object.fromEntries(list.map((a) => [a.name, a]));

@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: "50mb" },
   },
+  // Prompt files are read from disk at runtime; make sure they ship with the serverless bundle.
+  outputFileTracingIncludes: { "/**": ["./src/ai/prompts/**"] },
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
 };

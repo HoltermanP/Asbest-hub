@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { approvals } from "@/db/schema";
 import { audit } from "../audit";
 import type { AppContext } from "../auth";
+import type { Actor } from "../guards";
 import { emailLayout, sendEmail } from "../email";
 import { assertHumanActor } from "../guards";
 import { can, ForbiddenError, NotFoundError, ValidationError } from "../permissions";
@@ -12,8 +13,17 @@ import { APPROVAL_ENTITY_LABELS, type ApprovalDecision, type ApprovalEntityType,
 
 export * from "./types";
 
+/** Minimal requester info; AppContext satisfies this, and agents build it from the job. */
+export interface Requester {
+  orgId: string;
+  userId: string;
+  name: string;
+  email: string;
+  actor: Actor;
+}
+
 export interface RequestApprovalInput {
-  ctx: AppContext;
+  ctx: Requester;
   entityType: ApprovalEntityType;
   entityId: string;
   label: string;
