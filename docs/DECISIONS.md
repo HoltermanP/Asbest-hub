@@ -56,3 +56,19 @@ Dit document legt alle keuzes vast die tijdens de bouw van AsbestHub zijn gemaak
 | 38 | **Publicatiepakket: zip via `/api/tenders/[id]/publicatiepakket`** met alleen geaccordeerde stukken (`NN_Naam_vX.ext`), `aankondiging_tenderned.txt` en `00_checklist_publicatie.txt`. De UI meldt expliciet dat er geen TenderNed-koppeling is. | Conform §B1.5. |
 | 39 | **Beoordelaars worden per aanbesteding uitgenodigd op e-mailadres (`tender_assessors`)**; toegang voor rollen beoordelaar/extern wordt gekoppeld zodra de gebruiker inlogt met dat e-mailadres (`assertTenderAccess` matcht op userId óf e-mail). | Uitnodigen kan voordat de persoon een Clerk-account heeft. |
 | 40 | **Statusovergang naar "gegund" is niet handmatig mogelijk**; alleen via een geaccordeerd gunningsadvies. | Human-in-the-loop op de meest gevoelige overgang. |
+
+## Fase 4 - Beoordelingsmodule
+
+| # | Beslissing | Motivatie |
+|---|-----------|-----------|
+| 41 | **Inschrijvingen: tekstextractie, chunking en embedding draaien direct na de upload (`after()`)**; de AI-controle en -beoordeling zijn aparte, expliciet gestarte taken. | Uploaden blijft snel; AI-kosten alleen op verzoek. |
+| 42 | **Formele controle = deterministische checks + AI.** Volledigheid (herkenning op naam en inhoud), rekenkundige prijsbladcontrole (tolerantie € 1) en abnormaal-laag-check (> 20% onder gemiddelde óf raming) staan in code (`bid-checks.ts`); de AI beoordeelt uitsluitingsgronden, geschiktheid en certificaten met citaten. | Getalsmatige controles zijn reproduceerbaar; de AI mag alleen duiden. |
+| 43 | **Uitsluiting is een tweetrapsraket:** een mens stelt uitsluiting voor (`proposeExclusionAction`, beschermd door `assertHumanActor`), een tweede mens met accorderingsrecht keurt goed (`bid_exclusion`-handler). De AI kan geen van beide. | Vier-ogenprincipe op de meest ingrijpende beslissing. |
+| 44 | **AI-advies zichtbaarheid: standaard pas na indienen van de eigen score** (`canSeeAiAdvice`), instelbaar per aanbesteding (`aiAdviceBefore`) en als organisatiedefault. Indienen vergrendelt de score server-side. | Beperkt beïnvloeding (§B2.4). |
+| 45 | **Het prijscriterium wordt nooit door beoordelaars gescoord**; de score volgt uit de gunningsformule bij het gunningsadvies. | Objectiviteit. |
+| 46 | **Vergelijkende AI-analyse per criterium (`ai_comparisons`) wordt in dezelfde taak na de individuele AI-beoordelingen gemaakt** en beoordeelt consistentie van de AI-scores, zonder nieuwe scores te geven. | §B2.3 "één vergelijkende analyse per criterium". |
+| 47 | **Sessieverwerking anonimiseert beoordelaars ("Beoordelaar A/B/C") vóór de tekst naar het model gaat.** Audio wordt via Whisper getranscribeerd tijdens de verwerkingstaak. | AVG: geen namen in prompts waar dat niet functioneel nodig is. |
+| 48 | **Consensusscores zijn één record per (inschrijver, criterium)**; sessies overschrijven alleen niet-geaccordeerde consensus. Accordering gebeurt per criterium (één klik maakt per score een `consensus_score`-approval aan) en elke score wordt afzonderlijk definitief. | Meerdere sessies per aanbesteding; geaccordeerde scores zijn onaantastbaar. |
+| 49 | **Ranking wordt in code berekend (`rankBids`) op basis van uitsluitend geaccordeerde consensusscores; de AI schrijft alleen de onderbouwing, risicoanalyse en brieven.** Ontbrekende geaccordeerde scores blokkeren het gunningsadvies. | De AI kan geen score of rangorde definitief maken. |
+| 50 | **Gunnings- en afwijzingsbrieven zijn tender_documents (`gunningsbrief`/`afwijzingsbrief`, gekoppeld aan een inschrijving)** met eigen accordering en docx/pdf-export. Accordering van het gunningsadvies zet de aanbesteding op "gegund". | Hergebruik van de documentenpijplijn. |
+| 51 | **Inline documentviewer = pdf in iframe (pagina via #page=) naast de geëxtraheerde paginatekst met gemarkeerde citaatpassage.** | Werkt zonder zware pdf.js-bundel, ook op tablets; citaten uit het AI-advies linken direct naar bestand + pagina + passage. |
