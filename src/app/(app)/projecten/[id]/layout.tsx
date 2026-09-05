@@ -32,7 +32,12 @@ export default async function ProjectLayout({ children, params }: { children: Re
             {project.isDemo ? <StatusBadge value="concept" label="Demo" /> : null}
           </>
         }
-        actions={can(ctx.role, "project:write") ? <Button variant="outline" size="sm" render={<Link href={`/projecten/${project.id}/bewerken`}>Bewerken</Link>} /> : null}
+        actions={
+          <>
+            <Button variant="outline" size="sm" render={<a href={`/api/projects/${project.id}/dossier`}>Dossier exporteren (zip)</a>} />
+            {can(ctx.role, "project:write") ? <Button variant="outline" size="sm" render={<Link href={`/projecten/${project.id}/bewerken`}>Bewerken</Link>} /> : null}
+          </>
+        }
       />
       <ProjectTabs projectId={project.id} />
       <div className="mt-4">{children}</div>

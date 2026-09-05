@@ -84,3 +84,13 @@ Dit document legt alle keuzes vast die tijdens de bouw van AsbestHub zijn gemaak
 | 56 | **Hybride zoeken = pgvector cosine (halfvec-index) + Postgres full-text (config `dutch`, `websearch_to_tsquery`, GIN-index in migratie 0001) met OR-relaxatie en pg_trgm `word_similarity` als fuzzy fallback, gefuseerd met reciprocal rank fusion.** Zonder OPENAI_API_KEY werkt alleen het full-text pad. | pg_trgm alleen was te zwak voor meerwoordige vragen tegen lange chunks; FTS met Nederlandse stemming geeft goede recall. |
 | 57 | **Import is idempotent op inhoudshash**: ongewijzigde bronnen worden overgeslagen (alleen datum bijgewerkt); de UI waarschuwt bij bronnen ouder dan 12 maanden. | Goedkoop herindexeren via cron of handmatig. |
 | 58 | **Kennisbankvragen lopen synchroon via de job-runner** (`ai_jobs`-record + `runJob`) zodat kosten, model en prompt-hash in het auditlog staan. | Zelfde audittrail als andere agents, maar directe respons. |
+
+## Fase 6 - Documentgeneratie, export en instellingen
+
+| # | Beslissing | Motivatie |
+|---|-----------|-----------|
+| 59 | **Projectdossier-export (`/api/projects/[id]/dossier`) bevat uitsluitend geaccordeerde documenten** (docx + pdf + geüploade bestanden), de inventarisatierapporten en een inhoudsopgave met provenance-regel per document, bronnenlijst, meldingen, betrokkenen en fasen. | Concepten horen niet in een dossier. |
+| 60 | **Instellingen zijn per organisatie opgeslagen in `organization_settings`** (naam op documenten, type, adres, notificatie-e-mail, inkoopbeleid, AI-defaults). Gebruikers en rollen worden in Clerk beheerd via het ingebedde `OrganizationProfile`. | Eén bron voor identiteit (Clerk), één voor domeininstellingen. |
+| 61 | **Dataverwijdering per organisatie (AVG) is een admin-actie met bevestigingszin** die alle rijen met het organisatie-id verwijdert (cascade via projecten/aanbestedingen). Bestanden in Blob worden niet automatisch verwijderd; de sleutels bevatten het org-id zodat een opruimactie eenvoudig is (zie PRIVACY.md). | |
+| 62 | **Zoekveld in de topbar zoekt in projecten, aanbestedingen (met tender-scoping) en de kennisbank (hybride).** | Eén ingang; geen aparte zoekindex nodig. |
+| 63 | **Foutafhandeling: `error.tsx` in de app-groep toont autorisatiefouten als "Geen toegang"**; server actions retourneren altijd `ActionResult` zodat de UI een toast toont in plaats van een crash. | |
